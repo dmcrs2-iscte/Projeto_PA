@@ -1,4 +1,5 @@
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class TestJSON {
 
@@ -13,9 +14,29 @@ class TestJSON {
     val jsonObject = JSONObject(mutableListOf(JSONProperty("jsonArray", jsonArray), JSONProperty("jsonFloat", jsonFloat)))
 
     @Test
-    fun testJSON(){
+    fun testJSON() {
         jsonObject.addElement(JSONProperty("newString", jsonString))
         val newObject = JSONObject(mutableListOf(JSONProperty("jsonArray", jsonArray), JSONProperty("jsonFloat", jsonFloat), JSONProperty("newString", jsonString)))
-        println(jsonObject == newObject)
+        assertEquals(jsonObject, newObject)
+    }
+
+    @Test
+    fun testGetValueByName() {
+        val array = JSONArray(mutableListOf(
+            JSONObject(mutableListOf(
+                JSONProperty("numero", JSONNumber(1)),
+                JSONProperty("nome", JSONString("eu"))
+            )),
+            JSONObject(mutableListOf(
+                JSONProperty("numero", JSONNumber(2)),
+                JSONProperty("nome", JSONString("tu"))
+            ))
+        )
+        )
+
+        val expected = mutableListOf<JSONElement>(JSONNumber(1), JSONNumber(2))
+        val visitor = GetValueByName("numero")
+        array.accept(visitor)
+        assertEquals(expected, visitor.getValues())
     }
 }
