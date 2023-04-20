@@ -35,8 +35,37 @@ class TestJSON {
         )
 
         val expected = mutableListOf<JSONElement>(JSONNumber(1), JSONNumber(2))
-        val visitor = GetValueByName("numero")
+        val visitor = GetValuesByName("numero")
         array.accept(visitor)
         assertEquals(expected, visitor.getValues())
+    }
+
+    @Test
+    fun testGetObjectByProperty() {
+        val array = JSONArray(mutableListOf(
+            JSONObject(mutableListOf(
+                JSONProperty("numero", JSONNumber(1)),
+                JSONProperty("nome", JSONString("eu")),
+                JSONProperty("docente", JSONBoolean(true))
+            )),
+            JSONObject(mutableListOf(
+                JSONProperty("numero", JSONNumber(2))
+            )),
+            JSONObject(mutableListOf(
+                JSONProperty("numero", JSONNumber(3)),
+                JSONProperty("nome", JSONBoolean(true))
+            ))
+        )
+        )
+
+        val expected = mutableListOf(JSONObject(mutableListOf(
+            JSONProperty("numero", JSONNumber(1)),
+            JSONProperty("nome", JSONString("eu")),
+            JSONProperty("docente", JSONBoolean(true))
+        )))
+
+        val visitor = GetObjectsByProperty(mutableListOf("numero", "nome", "docente"))
+        array.accept(visitor)
+        assertEquals(expected, visitor.getObjects())
     }
 }
