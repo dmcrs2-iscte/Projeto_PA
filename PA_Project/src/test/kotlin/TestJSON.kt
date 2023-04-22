@@ -3,15 +3,15 @@ import kotlin.test.assertEquals
 
 class TestJSON {
 
-    val jsonString = JSONString("abc")
-    val jsonNumber = JSONNumber(123)
-    val jsonBoolean = JSONBoolean(true)
-    val jsonEmpty = JSONEmpty()
-    val jsonFloat = JSONFloat(1.23f)
-    val jsonObject1 = JSONObject(mutableListOf(JSONProperty("jsonString", jsonString), JSONProperty("jsonNumber", jsonNumber)))
-    val jsonArray = JSONArray(mutableListOf(jsonObject1, jsonBoolean, jsonEmpty))
+    private val jsonString = JSONString("abc")
+    private val jsonNumber = JSONNumber(123)
+    private val jsonBoolean = JSONBoolean(true)
+    private val jsonEmpty = JSONEmpty()
+    private val jsonFloat = JSONFloat(1.23f)
+    private val jsonObject1 = JSONObject(mutableListOf(JSONProperty("jsonString", jsonString), JSONProperty("jsonNumber", jsonNumber)))
+    private val jsonArray = JSONArray(mutableListOf(jsonObject1, jsonBoolean, jsonEmpty))
 
-    val jsonObject = JSONObject(mutableListOf(JSONProperty("jsonArray", jsonArray), JSONProperty("jsonFloat", jsonFloat)))
+    private val jsonObject = JSONObject(mutableListOf(JSONProperty("jsonArray", jsonArray), JSONProperty("jsonFloat", jsonFloat)))
 
     @Test
     fun testJSON() {
@@ -35,9 +35,7 @@ class TestJSON {
         )
 
         val expected = mutableListOf<JSONElement>(JSONNumber(1), JSONNumber(2))
-        val visitor = GetValuesByName("numero")
-        array.accept(visitor)
-        assertEquals(expected, visitor.getValues())
+        assertEquals(expected, array.getValuesByName("numero"))
     }
 
     @Test
@@ -64,8 +62,6 @@ class TestJSON {
             JSONProperty("docente", JSONBoolean(true))
         )))
 
-        val visitor = GetObjectsByProperty(mutableListOf("numero", "nome", "docente"))
-        array.accept(visitor)
-        assertEquals(expected, visitor.getObjects())
+        assertEquals(expected, array.getObjectsByProperty(mutableListOf("numero", "nome", "docente")))
     }
 }
