@@ -37,15 +37,15 @@ internal class GetObjectsByProperty(private val properties: List<String>) : JSON
     }
 }
 
-internal class CheckPropertyValues(private val name : String, private val lambda:(JSONLeaf) -> Boolean ={ true }) : JSONVisitor {
-    private var onlyGoodValues: Boolean = true
+internal class CheckPropertyValues(private val name: String, private val lambda:(JSONLeaf) -> Boolean = { true }) : JSONVisitor {
+    private var valid: Boolean = true
 
-    override fun visit(p: JSONProperty) : Boolean {
-        if (p.name == name && !lambda(p.element as JSONLeaf)) onlyGoodValues = false
+    override fun visit(p: JSONProperty): Boolean {
+        if (p.name == name && !lambda(p.element as JSONLeaf)) valid = false
         return true
     }
 
-    fun getVerdict(): Boolean{
-        return onlyGoodValues
+    fun isValid(): Boolean{
+        return valid
     }
 }

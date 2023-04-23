@@ -146,19 +146,16 @@ class TestJSON {
             )
         )
 
-        val expected1 = true
-        val expected2 = false
+        assertEquals(true, array1.areStrings("nome"))
+        assertEquals(true, array1.areBooleans("docente"))
+        assertEquals(true, array1.areFloats("altura"))
+        assertEquals(true, array1.areNumbers("numero"))
+        assertEquals(true, array1.areNulls("data"))
 
-        assertEquals(expected1, array1.areStrings("nome"))
-        assertEquals(expected1, array1.areBooleans("docente"))
-        assertEquals(expected1, array1.areFloats("altura"))
-        assertEquals(expected1, array1.areNumbers("numero"))
-        assertEquals(expected1, array1.areNulls("data"))
-
-        assertEquals(expected2, array2.areStrings("nome"))
-        assertEquals(expected2, array2.areBooleans("docente"))
-        assertEquals(expected2, array2.areFloats("altura"))
-        assertEquals(expected2, array2.areNumbers("numero"))
-        assertEquals(expected2, array2.areNulls("data"))
+        assertEquals(false, array2.areStrings("nome"))
+        assertEquals(false, array2.areBooleans("docente"))
+        assertEquals(false, array2.areFloats("altura"))
+        assertEquals(false, array2.areNumbers("numero"))
+        assertEquals(false, array2.areNulls("data"))
     }
 }
