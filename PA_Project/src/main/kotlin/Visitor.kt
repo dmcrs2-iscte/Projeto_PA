@@ -9,7 +9,7 @@ sealed interface JSONVisitor {
     fun visit(p: JSONProperty): Boolean = true
 }
 
-class GetValuesByName(private val name: String) : JSONVisitor {
+internal class GetValuesByName(private val name: String) : JSONVisitor {
     private var list = mutableListOf<JSONElement>()
 
     override fun visit(p: JSONProperty) : Boolean {
@@ -22,7 +22,7 @@ class GetValuesByName(private val name: String) : JSONVisitor {
     }
 }
 
-class GetObjectsByProperty(private val properties: List<String>) : JSONVisitor {
+internal class GetObjectsByProperty(private val properties: List<String>) : JSONVisitor {
     private var list = mutableListOf<JSONObject>()
 
     override fun visit(o: JSONObject): Boolean {
@@ -34,5 +34,18 @@ class GetObjectsByProperty(private val properties: List<String>) : JSONVisitor {
 
     fun getObjects(): MutableList<JSONObject> {
         return list
+    }
+}
+
+internal class CheckPropertyValues(private val name : String, private val lambda:(JSONLeaf) -> Boolean ={ true }) : JSONVisitor {
+    private var onlyGoodValues: Boolean = true
+
+    override fun visit(p: JSONProperty) : Boolean {
+        if (p.name == name && !lambda(p.element as JSONLeaf)) onlyGoodValues = false
+        return true
+    }
+
+    fun getVerdict(): Boolean{
+        return onlyGoodValues
     }
 }

@@ -22,6 +22,41 @@ sealed interface JSONNode: JSONElement {
         this.accept(visitor)
         return visitor.getObjects()
     }
+
+    fun areNumbers(name: String): Boolean {
+        val isNumber: (JSONLeaf) -> Boolean = { leaf: JSONLeaf-> leaf.value is Int }
+        val visitor = CheckPropertyValues(name, isNumber)
+        this.accept(visitor)
+        return visitor.getVerdict()
+    }
+
+    fun areFloats(name: String): Boolean {
+        val isFloat: (JSONLeaf) -> Boolean = { leaf: JSONLeaf-> leaf.value is Float }
+        val visitor = CheckPropertyValues(name, isFloat)
+        this.accept(visitor)
+        return visitor.getVerdict()
+    }
+
+    fun areNulls(name: String): Boolean {
+        val isNull: (JSONLeaf) -> Boolean = { leaf: JSONLeaf-> leaf.value == null }
+        val visitor = CheckPropertyValues(name, isNull)
+        this.accept(visitor)
+        return visitor.getVerdict()
+    }
+
+    fun areStrings(name: String): Boolean{
+        val isString: (JSONLeaf) -> Boolean = { leaf: JSONLeaf-> leaf.value is String }
+        val visitor = CheckPropertyValues(name, isString)
+        this.accept(visitor)
+        return visitor.getVerdict()
+    }
+
+    fun areBooleans(name: String): Boolean{
+        val isBoolean: (JSONLeaf) -> Boolean = { leaf: JSONLeaf-> leaf.value is Boolean }
+        val visitor = CheckPropertyValues(name, isBoolean)
+        this.accept(visitor)
+        return visitor.getVerdict()
+    }
 }
 
 data class JSONProperty(internal val name: String, internal val element: JSONElement): JSONElement {
