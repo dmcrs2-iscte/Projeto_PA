@@ -11,6 +11,7 @@ sealed interface JSONLeaf: JSONElement{
 }
 
 sealed interface JSONNode: JSONElement {
+
     fun getValuesByName(name: String): MutableList<JSONElement>{
         val visitor = GetValuesByName(name)
         this.accept(visitor)
@@ -24,7 +25,13 @@ sealed interface JSONNode: JSONElement {
     }
 
     private fun arePropertiesOfType(name: String, predicate: (Any?) -> Boolean): Boolean {
-        val isMatch: (JSONLeaf) -> Boolean = { leaf: JSONLeaf -> predicate(leaf.value) }
+        val isMatch: (JSONElement) -> Boolean = { element: JSONElement ->
+            when (element) {
+                is JSONLeaf -> predicate(element.value)
+                is JSONObject -> predicate(element.list)
+                is JSONArray -> predicate(element.list)
+            }
+        }
         val visitor = CheckPropertyValues(name, isMatch)
         this.accept(visitor)
         return visitor.isValid()
@@ -35,10 +42,16 @@ sealed interface JSONNode: JSONElement {
     fun areNulls(name: String): Boolean = this.arePropertiesOfType(name) { it == null }
     fun areStrings(name: String): Boolean = this.arePropertiesOfType(name) { it is String }
     fun areBooleans(name: String): Boolean = this.arePropertiesOfType(name) { it is Boolean }
+
+    fun arePropertyLists(name: String): Boolean = this.arePropertiesOfType(name) { this.arePropertiesOfType(name) {
+        it is List<*> && it.all { item -> item is JSONProperty } } }
+
+    fun areElementLists(name: String): Boolean = this.arePropertiesOfType(name) { this.arePropertiesOfType(name) {
+        it is List<*> && it.all { item -> item is JSONElement } } }
 }
 
-data class JSONProperty(internal val name: String, internal val element: JSONElement): JSONElement {
-    override fun accept(v: JSONVisitor) {
+data class JSONProperty(internal val name: String, internal val element: JSONElement) {
+    fun accept(v: JSONVisitor) {
         if (v.visit(this)) element.accept(v)
     }
 

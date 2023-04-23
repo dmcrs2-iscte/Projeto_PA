@@ -91,71 +91,104 @@ class TestJSON {
 
     @Test
     fun testCheckPropertyValue() {
-        val array1 = JSONArray(
+        val obj1 = JSONObject(
             mutableListOf(
-                JSONObject(
-                    mutableListOf(
-                        JSONProperty("numero", JSONNumber(1)),
-                        JSONProperty("nome", JSONString("eu")),
-                        JSONProperty("docente", JSONBoolean(true)),
-                        JSONProperty("altura", JSONFloat(1.73f))
+                JSONProperty( "Inscritos",
+                    JSONArray(
+                        mutableListOf(
+                            JSONObject(
+                                mutableListOf(
+                                    JSONProperty("numero", JSONNumber(1)),
+                                    JSONProperty("nome", JSONString("eu")),
+                                    JSONProperty("docente", JSONBoolean(true)),
+                                    JSONProperty("altura", JSONFloat(1.73f))
+                                )
+                            ),
+                            JSONObject(
+                                mutableListOf(
+                                    JSONProperty("numero", JSONNumber(2)),
+                                    JSONProperty("data", JSONEmpty())
+                                )
+                            ),
+                            JSONObject(
+                                mutableListOf(
+                                    JSONProperty("numero", JSONNumber(3)),
+                                    JSONProperty("nome", JSONString("tu")),
+                                    JSONProperty("data", JSONEmpty()),
+                                    JSONProperty("altura", JSONFloat(1.74f))
+                                )
+                            )
+                        )
                     )
                 ),
-                JSONObject(
-                    mutableListOf(
-                        JSONProperty("numero", JSONNumber(2)),
-                        JSONProperty("data", JSONEmpty())
+                JSONProperty("Outros",
+                    JSONObject(
+                        mutableListOf(
+                            JSONProperty("numero", JSONNumber(3)),
+                            JSONProperty("nome", JSONString("tu")),
+                            JSONProperty("data", JSONEmpty()),
+                            JSONProperty("altura", JSONFloat(1.74f))
+                        )
+                    ))
+            )
+        )
+
+        val obj2 = JSONObject(
+            mutableListOf(
+                JSONProperty("Outros",
+                    JSONArray(
+                        mutableListOf(
+                            JSONObject(
+                                mutableListOf(
+                                    JSONProperty("numero", JSONNumber(1)),
+                                    JSONProperty("nome", JSONString("eu")),
+                                    JSONProperty("docente", JSONBoolean(true)),
+                                    JSONProperty("altura", JSONFloat(1.73f))
+                                )
+                            ),
+                            JSONObject(
+                                mutableListOf(
+                                    JSONProperty("numero", JSONString("2")),
+                                    JSONProperty("data", JSONEmpty()),
+                                    JSONProperty("docente", JSONEmpty())
+                                )
+                            ),
+                            JSONObject(
+                                mutableListOf(
+                                    JSONProperty("numero", JSONNumber(3)),
+                                    JSONProperty("nome", JSONBoolean(true)),
+                                    JSONProperty("data", JSONString("01-02-2023")),
+                                    JSONProperty("altura", JSONNumber(2))
+                                )
+                            )
+                        )
                     )
                 ),
-                JSONObject(
-                    mutableListOf(
-                        JSONProperty("numero", JSONNumber(3)),
-                        JSONProperty("nome", JSONString("tu")),
-                        JSONProperty("data", JSONEmpty()),
-                        JSONProperty("altura", JSONFloat(1.74f))
+                JSONProperty("Inscritos",
+                    JSONObject(
+                        mutableListOf(
+                            JSONProperty("numero", JSONNumber(3)),
+                            JSONProperty("nome", JSONBoolean(true)),
+                            JSONProperty("data", JSONString("01-02-2023")),
+                            JSONProperty("altura", JSONNumber(2))
+                        )
                     )
                 )
             )
         )
 
-        val array2 = JSONArray(
-            mutableListOf(
-                JSONObject(
-                    mutableListOf(
-                        JSONProperty("numero", JSONNumber(1)),
-                        JSONProperty("nome", JSONString("eu")),
-                        JSONProperty("docente", JSONBoolean(true)),
-                        JSONProperty("altura", JSONFloat(1.73f))
-                    )
-                ),
-                JSONObject(
-                    mutableListOf(
-                        JSONProperty("numero", JSONString("2")),
-                        JSONProperty("data", JSONEmpty()),
-                        JSONProperty("docente", JSONEmpty())
-                    )
-                ),
-                JSONObject(
-                    mutableListOf(
-                        JSONProperty("numero", JSONNumber(3)),
-                        JSONProperty("nome", JSONBoolean(true)),
-                        JSONProperty("data", JSONString("01-02-2023")),
-                        JSONProperty("altura", JSONNumber(2))
-                    )
-                )
-            )
-        )
+        assertEquals(true, obj1.areStrings("nome"))
+        assertEquals(true, obj1.areBooleans("docente"))
+        assertEquals(true, obj1.areFloats("altura"))
+        assertEquals(true, obj1.areNumbers("numero"))
+        assertEquals(true, obj1.areNulls("data"))
+        assertEquals(true, obj1.arePropertyLists("Outros"))
+        assertEquals(true, obj1.areElementLists("Inscritos"))
 
-        assertEquals(true, array1.areStrings("nome"))
-        assertEquals(true, array1.areBooleans("docente"))
-        assertEquals(true, array1.areFloats("altura"))
-        assertEquals(true, array1.areNumbers("numero"))
-        assertEquals(true, array1.areNulls("data"))
-
-        assertEquals(false, array2.areStrings("nome"))
-        assertEquals(false, array2.areBooleans("docente"))
-        assertEquals(false, array2.areFloats("altura"))
-        assertEquals(false, array2.areNumbers("numero"))
-        assertEquals(false, array2.areNulls("data"))
+        assertEquals(false, obj2.areStrings("nome"))
+        assertEquals(false, obj2.areBooleans("docente"))
+        assertEquals(false, obj2.areFloats("altura"))
+        assertEquals(false, obj2.areNumbers("numero"))
+        assertEquals(false, obj2.areNulls("data"))
     }
 }
