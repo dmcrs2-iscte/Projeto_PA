@@ -10,7 +10,8 @@ sealed interface JSONLeaf: JSONElement{
     }
 }
 
-sealed interface JSONNode: JSONElement {
+sealed interface JSONNode<T>: JSONElement {
+    val list: MutableList<T>
 
     fun getValuesByName(name: String): MutableList<JSONElement>{
         val visitor = GetValuesByName(name)
@@ -28,8 +29,7 @@ sealed interface JSONNode: JSONElement {
         val isMatch: (JSONElement) -> Boolean = { element: JSONElement ->
             when (element) {
                 is JSONLeaf -> predicate(element.value)
-                is JSONObject -> predicate(element.list)
-                is JSONArray -> predicate(element.list)
+                is JSONNode<*> -> predicate(element.list)
             }
         }
         val visitor = CheckPropertyValues(name, isMatch)
@@ -91,15 +91,13 @@ data class JSONEmpty(override val value: Nothing? = null): JSONLeaf {
     }
 }
 
-
-data class JSONObject(internal var list: MutableList<JSONProperty> = mutableListOf()): JSONNode {
+data class JSONObject(override val list: MutableList<JSONProperty>): JSONNode<JSONProperty> {
     fun addElement(property: JSONProperty) {
         list.add(property)
     }
 
     override fun accept(v: JSONVisitor) {
         if (v.visit(this)) list.forEach { it.accept(v) }
-        v.endVisit(this)
     }
 
     override fun toString(): String {
@@ -107,14 +105,13 @@ data class JSONObject(internal var list: MutableList<JSONProperty> = mutableList
     }
 }
 
-data class JSONArray(internal var list: MutableList<JSONElement> = mutableListOf()) : JSONNode {
+data class JSONArray(override val list: MutableList<JSONElement>) : JSONNode<JSONElement> {
     fun addElement(element: JSONElement) {
         list.add(element)
     }
 
     override fun accept(v: JSONVisitor) {
         if (v.visit(this)) list.forEach { it.accept(v) }
-        v.endVisit(this)
     }
 
     override fun toString(): String {
