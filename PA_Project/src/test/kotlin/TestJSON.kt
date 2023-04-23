@@ -8,12 +8,11 @@ class TestJSON {
     private val jsonBoolean = JSONBoolean(true)
     private val jsonEmpty = JSONEmpty()
     private val jsonFloat = JSONFloat(1.23f)
-    private val jsonObject1 =
-        JSONObject(mutableListOf(JSONProperty("jsonString", jsonString), JSONProperty("jsonNumber", jsonNumber)))
+
+    private val jsonObject1 = JSONObject(mutableListOf(JSONProperty("jsonString", jsonString), JSONProperty("jsonNumber", jsonNumber)))
     private val jsonArray = JSONArray(mutableListOf(jsonObject1, jsonBoolean, jsonEmpty))
 
-    private val jsonObject =
-        JSONObject(mutableListOf(JSONProperty("jsonArray", jsonArray), JSONProperty("jsonFloat", jsonFloat)))
+    private val jsonObject = JSONObject(mutableListOf(JSONProperty("jsonArray", jsonArray), JSONProperty("jsonFloat", jsonFloat)))
 
     @Test
     fun testJSON() {
