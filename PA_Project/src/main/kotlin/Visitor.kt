@@ -25,9 +25,7 @@ internal class GetObjectsByProperty(private val properties: List<String>) : JSON
     private var list = mutableListOf<JSONObject>()
 
     override fun visit(o: JSONObject): Boolean {
-        if (properties.all { property -> o.list.any { it.name == property } }) {
-            list.add(o)
-        }
+        if (properties.all { property -> o.value.any { it.name == property } }) list.add(o)
         return true
     }
 
@@ -36,7 +34,7 @@ internal class GetObjectsByProperty(private val properties: List<String>) : JSON
     }
 }
 
-internal class CheckPropertyValues(private val name: String, private val lambda:(JSONElement) -> Boolean = { true }) : JSONVisitor {
+internal class CheckPropertyValues(private val name: String, private val lambda: (JSONElement) -> Boolean = { true }) : JSONVisitor {
     private var valid: Boolean = true
 
     override fun visit(p: JSONProperty): Boolean {
@@ -44,9 +42,7 @@ internal class CheckPropertyValues(private val name: String, private val lambda:
         return true
     }
 
-    fun isValid(): Boolean{
-        return valid
-    }
+    fun isValid(): Boolean = valid
 }
 
 internal class CheckArrayStructure(private val name: String) : JSONVisitor {

@@ -1,9 +1,11 @@
 sealed interface JSONElement {
+    val value: Any?
+
     fun accept(v: JSONVisitor)
 }
 
 sealed interface JSONLeaf: JSONElement{
-    val value: Any?
+    override val value: Any?
 
     override fun accept(v: JSONVisitor) {
         v.visit(this)
@@ -11,7 +13,7 @@ sealed interface JSONLeaf: JSONElement{
 }
 
 sealed interface JSONNode<T>: JSONElement {
-    val list: MutableList<T>
+    override val value: MutableList<T>
 
     fun getValuesByName(name: String): MutableList<JSONElement>{
         val visitor = GetValuesByName(name)
@@ -27,10 +29,7 @@ sealed interface JSONNode<T>: JSONElement {
 
     private fun arePropertiesOfType(name: String, predicate: (Any?) -> Boolean): Boolean {
         val isMatch: (JSONElement) -> Boolean = { element: JSONElement ->
-            when (element) {
-                is JSONLeaf -> predicate(element.value)
-                is JSONNode<*> -> predicate(element.list)
-            }
+            predicate(element.value)
         }
         val visitor = CheckPropertyValues(name, isMatch)
         this.accept(visitor)
@@ -97,30 +96,30 @@ data class JSONEmpty(override val value: Nothing? = null): JSONLeaf {
     }
 }
 
-data class JSONObject(override val list: MutableList<JSONProperty>): JSONNode<JSONProperty> {
+data class JSONObject(override val value: MutableList<JSONProperty> = mutableListOf()): JSONNode<JSONProperty> {
     fun addElement(property: JSONProperty) {
-        list.add(property)
+        value.add(property)
     }
 
     override fun accept(v: JSONVisitor) {
-        if (v.visit(this)) list.forEach { it.accept(v) }
+        if (v.visit(this)) value.forEach { it.accept(v) }
     }
 
     override fun toString(): String {
-        return list.joinToString (prefix = "{", postfix = "}")
+        return value.joinToString (prefix = "{", postfix = "}")
     }
 }
 
-data class JSONArray(override val list: MutableList<JSONElement>) : JSONNode<JSONElement> {
+data class JSONArray(override val value: MutableList<JSONElement> = mutableListOf()) : JSONNode<JSONElement> {
     fun addElement(element: JSONElement) {
-        list.add(element)
+        value.add(element)
     }
 
     override fun accept(v: JSONVisitor) {
-        if (v.visit(this)) list.forEach { it.accept(v) }
+        if (v.visit(this)) value.forEach { it.accept(v) }
     }
 
     override fun toString(): String {
-        return list.joinToString (prefix = "[", postfix = "]")
+        return value.joinToString(prefix = "[", postfix = "]")
     }
 }
