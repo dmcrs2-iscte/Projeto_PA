@@ -1,5 +1,7 @@
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class TestJSON {
 
@@ -189,5 +191,116 @@ class TestJSON {
         assertEquals(false, obj2.areFloats("altura"))
         assertEquals(false, obj2.areNumbers("numero"))
         assertEquals(false, obj2.areNulls("data"))
+        assertEquals(false, obj2.arePropertyLists("Outros"))
+        assertEquals(false, obj2.areElementLists("Inscritos"))
+    }
+
+    @Test
+    fun testCheckArrayInternalStructure(){
+        val obj1 = JSONObject(
+            mutableListOf(
+                JSONProperty( "Inscritos",
+                    JSONArray(
+                        mutableListOf(
+                            JSONObject(
+                                mutableListOf(
+                                    JSONProperty("numero", JSONNumber(1)),
+                                    JSONProperty("nome", JSONString("eu")),
+                                    JSONProperty("docente", JSONBoolean(true)),
+                                    JSONProperty("altura", JSONFloat(1.73f))
+                                )
+                            ),
+                            JSONObject(
+                                mutableListOf(
+                                    JSONProperty("numero", JSONNumber(1)),
+                                    JSONProperty("nome", JSONString("eu")),
+                                    JSONProperty("docente", JSONBoolean(true)),
+                                    JSONProperty("altura", JSONFloat(1.73f))
+                                )
+                            ),
+                            JSONObject(
+                                mutableListOf(
+                                    JSONProperty("numero", JSONNumber(1)),
+                                    JSONProperty("nome", JSONString("eu")),
+                                    JSONProperty("docente", JSONBoolean(true)),
+                                    JSONProperty("altura", JSONFloat(1.73f))
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        val obj2 = JSONObject(
+            mutableListOf(
+                JSONProperty( "Inscritos",
+                    JSONArray(
+                        mutableListOf(
+                            JSONObject(
+                                mutableListOf(
+                                    JSONProperty("numero", JSONNumber(1)),
+                                    JSONProperty("nome", JSONString("eu")),
+                                    JSONProperty("docente", JSONBoolean(true)),
+                                    JSONProperty("altura", JSONFloat(1.73f))
+                                )
+                            ),
+                            JSONObject(
+                                mutableListOf(
+                                    JSONProperty("numero", JSONNumber(2)),
+                                    JSONProperty("data", JSONEmpty())
+                                )
+                            ),
+                            JSONObject(
+                                mutableListOf(
+                                    JSONProperty("numero", JSONNumber(3)),
+                                    JSONProperty("nome", JSONString("tu")),
+                                    JSONProperty("data", JSONEmpty()),
+                                    JSONProperty("altura", JSONFloat(1.74f))
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        val obj3 = JSONObject(
+            mutableListOf(
+                JSONProperty( "Inscritos",
+                    JSONArray(
+                        mutableListOf(
+                            JSONObject(
+                                mutableListOf(
+                                    JSONProperty("numero", JSONNumber(1)),
+                                    JSONProperty("nome", JSONString("eu")),
+                                    JSONProperty("docente", JSONBoolean(true)),
+                                    JSONProperty("altura", JSONFloat(1.73f))
+                                )
+                            ),
+                            JSONObject(
+                                mutableListOf(
+                                    JSONProperty("numero", JSONNumber(2)),
+                                    JSONProperty("data", JSONEmpty())
+                                )
+                            ),
+                            JSONObject(
+                                mutableListOf(
+                                    JSONProperty("numero", JSONNumber(3)),
+                                    JSONProperty("nome", JSONString("tu")),
+                                    JSONProperty("data", JSONEmpty()),
+                                    JSONProperty("altura", JSONFloat(1.74f))
+                                )
+                            ),
+                            JSONEmpty()
+                        )
+                    )
+                )
+            )
+        )
+
+        assertTrue(obj1.isStructuredArray("Inscritos"))
+        assertFalse(obj2.isStructuredArray("Inscritos"))
+        assertFalse(obj3.isStructuredArray("Inscritos"))
     }
 }

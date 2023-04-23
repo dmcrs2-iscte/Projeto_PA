@@ -49,4 +49,19 @@ internal class CheckPropertyValues(private val name: String, private val lambda:
     }
 }
 
-//internal class CheckInternalStructure
+internal class CheckArrayStructure(private val name: String) : JSONVisitor {
+    private var valid: Boolean = false
+
+    override fun visit(p: JSONProperty): Boolean {
+        if (p.name == name && p.element is JSONArray){
+            val array = p.element.value
+            if (array.all{ it is JSONObject}) {
+                val expected = (array.firstOrNull() as? JSONObject)?.value?.map { it.name to it.element::class }?.toSet()
+                if (array.all { (it as? JSONObject)?.value?.map { it.name to it.element::class }?.toSet() == expected }) valid = true
+            }
+        }
+        return true
+    }
+
+    fun isValid(): Boolean = valid
+}

@@ -48,6 +48,12 @@ sealed interface JSONNode<T>: JSONElement {
 
     fun areElementLists(name: String): Boolean = this.arePropertiesOfType(name) { this.arePropertiesOfType(name) {
         it is List<*> && it.all { item -> item is JSONElement } } }
+
+    fun isStructuredArray(name: String): Boolean{
+        val visitor = CheckArrayStructure(name)
+        this.accept(visitor)
+        return visitor.isValid()
+    }
 }
 
 data class JSONProperty(internal val name: String, internal val element: JSONElement) {
