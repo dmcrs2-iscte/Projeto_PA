@@ -16,9 +16,7 @@ internal class GetValuesByName(private val name: String) : JSONVisitor {
         return true
     }
 
-    fun getValues(): MutableList<JSONElement> {
-        return list
-    }
+    fun getValues(): MutableList<JSONElement> = list
 }
 
 internal class GetObjectsByProperty(private val properties: List<String>) : JSONVisitor {
@@ -29,9 +27,7 @@ internal class GetObjectsByProperty(private val properties: List<String>) : JSON
         return true
     }
 
-    fun getObjects(): MutableList<JSONObject> {
-        return list
-    }
+    fun getObjects(): MutableList<JSONObject> = list
 }
 
 internal class CheckPropertyValues(private val name: String, private val lambda: (JSONElement) -> Boolean = { true }) : JSONVisitor {

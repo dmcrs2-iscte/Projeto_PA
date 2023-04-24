@@ -7,15 +7,13 @@ sealed interface JSONElement {
 sealed interface JSONLeaf: JSONElement{
     override val value: Any?
 
-    override fun accept(v: JSONVisitor) {
-        v.visit(this)
-    }
+    override fun accept(v: JSONVisitor) = v.visit(this)
 }
 
 sealed interface JSONNode<T>: JSONElement {
     override val value: MutableList<T>
 
-    fun getValuesByName(name: String): MutableList<JSONElement>{
+    fun getValuesByName(name: String): MutableList<JSONElement> {
         val visitor = GetValuesByName(name)
         this.accept(visitor)
         return visitor.getValues()
@@ -28,13 +26,14 @@ sealed interface JSONNode<T>: JSONElement {
     }
 
     private fun arePropertiesOfType(name: String, predicate: (Any?) -> Boolean): Boolean {
-        val isMatch: (JSONElement) -> Boolean = { element: JSONElement ->
-            predicate(element.value)
-        }
+        val isMatch: (JSONElement) -> Boolean = { predicate(it.value) }
         val visitor = CheckPropertyValues(name, isMatch)
         this.accept(visitor)
         return visitor.isValid()
     }
+
+    private fun listAux(name: String, predicate: (Any?) -> Boolean): Boolean =
+        this.arePropertiesOfType(name) { it is List<*> && it.all(predicate) }
 
     fun areNumbers(name: String): Boolean = this.arePropertiesOfType(name) { it is Int }
     fun areFloats(name: String): Boolean = this.arePropertiesOfType(name) { it is Float }
@@ -42,13 +41,10 @@ sealed interface JSONNode<T>: JSONElement {
     fun areStrings(name: String): Boolean = this.arePropertiesOfType(name) { it is String }
     fun areBooleans(name: String): Boolean = this.arePropertiesOfType(name) { it is Boolean }
 
-    fun arePropertyLists(name: String): Boolean = this.arePropertiesOfType(name) { this.arePropertiesOfType(name) {
-        it is List<*> && it.all { item -> item is JSONProperty } } }
+    fun isListOfProperties(name: String): Boolean = listAux(name) { it is JSONProperty }
+    fun isListOfElements(name: String): Boolean = listAux(name) { it is JSONElement }
 
-    fun areElementLists(name: String): Boolean = this.arePropertiesOfType(name) { this.arePropertiesOfType(name) {
-        it is List<*> && it.all { item -> item is JSONElement } } }
-
-    fun isStructuredArray(name: String): Boolean{
+    fun isStructuredArray(name: String): Boolean {
         val visitor = CheckArrayStructure(name)
         this.accept(visitor)
         return visitor.isValid()
@@ -60,70 +56,49 @@ data class JSONProperty(internal val name: String, internal val element: JSONEle
         if (v.visit(this)) element.accept(v)
     }
 
-    override fun toString(): String {
-        return "\"$name\":$element"
-    }
+    override fun toString(): String = "\"$name\":$element"
 
-    fun getName(): String{
-        return name
-    }
+    fun getName(): String = name
+    fun getElement(): JSONElement = element
 }
 
 
 data class JSONString(override val value: String): JSONLeaf {
-    override fun toString(): String {
-        return "\"$value\""
-    }
+    override fun toString() = "\"$value\""
 }
 
 data class JSONNumber(override val value: Int): JSONLeaf {
-    override fun toString(): String {
-        return value.toString()
-    }
+    override fun toString() = value.toString()
 }
 
 data class JSONBoolean(override val value: Boolean): JSONLeaf {
-    override fun toString(): String {
-        return value.toString()
-    }
+    override fun toString() = value.toString()
 }
 
 data class JSONFloat(override val value: Float): JSONLeaf {
-    override fun toString(): String {
-        return value.toString()
-    }
+    override fun toString() = value.toString()
 }
 
 data class JSONEmpty(override val value: Nothing? = null): JSONLeaf {
-    override fun toString(): String {
-        return "null"
-    }
+    override fun toString() = "null"
 }
 
 data class JSONObject(override val value: MutableList<JSONProperty> = mutableListOf()): JSONNode<JSONProperty> {
-    fun addElement(element: JSONProperty) {
-        value.add(element)
-    }
+    fun addElement(element: JSONProperty) = value.add(element)
 
     override fun accept(v: JSONVisitor) {
         if (v.visit(this)) value.forEach { it.accept(v) }
     }
 
-    override fun toString(): String {
-        return value.joinToString (prefix = "{", postfix = "}")
-    }
+    override fun toString() = value.joinToString (prefix = "{", postfix = "}")
 }
 
 data class JSONArray(override val value: MutableList<JSONElement> = mutableListOf()) : JSONNode<JSONElement> {
-    fun addElement(element: JSONElement) {
-        value.add(element)
-    }
+    fun addElement(element: JSONElement) = value.add(element)
 
     override fun accept(v: JSONVisitor) {
         if (v.visit(this)) value.forEach { it.accept(v) }
     }
 
-    override fun toString(): String {
-        return value.joinToString(prefix = "[", postfix = "]")
-    }
+    override fun toString() = value.joinToString(prefix = "[", postfix = "]")
 }

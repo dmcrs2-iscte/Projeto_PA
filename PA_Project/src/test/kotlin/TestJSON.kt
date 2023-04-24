@@ -183,16 +183,16 @@ class TestJSON {
         assertTrue(obj1.areFloats("altura"))
         assertTrue(obj1.areNumbers("numero"))
         assertTrue(obj1.areNulls("data"))
-        assertTrue(obj1.arePropertyLists("Outros"))
-        assertTrue(obj1.areElementLists("Inscritos"))
+        assertTrue(obj1.isListOfProperties("Outros"))
+        assertTrue(obj1.isListOfElements("Inscritos"))
 
         assertFalse(obj2.areStrings("nome"))
         assertFalse(obj2.areBooleans("docente"))
         assertFalse(obj2.areFloats("altura"))
         assertFalse(obj2.areNumbers("numero"))
         assertFalse(obj2.areNulls("data"))
-        assertFalse(obj2.arePropertyLists("Outros"))
-        assertFalse(obj2.areElementLists("Inscritos"))
+        assertFalse(obj2.isListOfProperties("Outros"))
+        assertFalse(obj2.isListOfElements("Inscritos"))
     }
 
     @Test

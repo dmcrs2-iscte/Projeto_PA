@@ -27,7 +27,7 @@ class JSONGenerator {
                 }
                 is Boolean -> addToObject(JSONBoolean(value))
                 is Char, is String -> addToObject(JSONString(value.toString()))
-                is Collection<*> -> {
+                is Iterable<*> -> {
                     val array = JSONArray()
                     value.forEach { assignJSONTypes(array, value=it) }
                     addToObject(array)
