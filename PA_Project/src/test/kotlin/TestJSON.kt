@@ -305,6 +305,7 @@ class TestJSON {
     }
 
     data class Student(
+        //@JSONGenerator.AsJSONString
         val number: Int,
         val name: String,
         val type: StudentType? = null,
@@ -313,7 +314,9 @@ class TestJSON {
         val courses: Collection<String>,
         val scores: Map<String, Int>,
         val valid: Boolean,
-        val professor: Professor
+        val professor: Professor,
+        @JSONGenerator.ExcludeFromJSON
+        val toExclude: String
     )
 
     data class Professor(
@@ -328,7 +331,8 @@ class TestJSON {
     @Test
     fun testJsonGenerator() {
         val student = Student(1, "eu", StudentType.Bachelor, null, 1.73, listOf("MEC","ROB","TAM","MER","BOA"),
-            mapOf("MEC" to 1, "ROB" to 2,"TAM" to 3,"MER" to 4,"BOA" to 5), true, Professor(40, "Pedro")
+            mapOf("MEC" to 1, "ROB" to 2,"TAM" to 3,"MER" to 4,"BOA" to 5), true, Professor(40, "Pedro"),
+            "WillBeExcluded"
         )
 
         val json = JSONGenerator.generateJSON(student)
