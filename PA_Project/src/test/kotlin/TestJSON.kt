@@ -304,12 +304,26 @@ class TestJSON {
         assertFalse(obj3.isStructuredArray("Inscritos"))
     }
 
+    data class Student(
+        val number: Int,
+        val name: String,
+        //val type: StudentType? = null,
+        val birth: String? = null,
+        val height: Double,
+        val courses: Collection<String>,
+        val scores: Map<String, Int>,
+        val valid: Boolean
+    )
+
+    enum class StudentType {
+        Bachelor, Master, Doctoral
+    }
+
     @Test
     fun testJsonGenerator(){
         val student = Student(1, "eu", null, 1.73, listOf("MEC","ROB","TAM","MER","BOA"),
             mapOf("MEC" to 1, "ROB" to 2,"TAM" to 3,"MER" to 4,"BOA" to 5), true)
-        val generator = JSONGenerator()
-        val json = generator.generateJSON(student)
+        val json = JSONGenerator.generateJSON(student)
 
         val required = JSONObject(mutableListOf(JSONProperty("number", JSONNumber(1)), JSONProperty("name", JSONString("eu")),
             JSONProperty("birth", JSONEmpty()), JSONProperty("height", JSONFloat(1.73f)), JSONProperty("courses", JSONArray(
