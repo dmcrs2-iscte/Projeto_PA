@@ -101,8 +101,8 @@ data class JSONEmpty(override val value: Nothing? = null): JSONLeaf {
 }
 
 data class JSONObject(override val value: MutableList<JSONProperty> = mutableListOf()): JSONNode<JSONProperty> {
-    fun addElement(property: JSONProperty) {
-        value.add(property)
+    fun addElement(element: JSONProperty) {
+        value.add(element)
     }
 
     override fun accept(v: JSONVisitor) {
