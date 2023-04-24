@@ -36,12 +36,17 @@ sealed interface JSONNode<T>: JSONElement {
         this.arePropertiesOfType(name) { it is List<*> && it.all(predicate) }
 
     fun areNumbers(name: String): Boolean = this.arePropertiesOfType(name) { it is Int }
+
     fun areFloats(name: String): Boolean = this.arePropertiesOfType(name) { it is Float }
+
     fun areNulls(name: String): Boolean = this.arePropertiesOfType(name) { it == null }
+
     fun areStrings(name: String): Boolean = this.arePropertiesOfType(name) { it is String }
+
     fun areBooleans(name: String): Boolean = this.arePropertiesOfType(name) { it is Boolean }
 
     fun isListOfProperties(name: String): Boolean = listAux(name) { it is JSONProperty }
+
     fun isListOfElements(name: String): Boolean = listAux(name) { it is JSONElement }
 
     fun isStructuredArray(name: String): Boolean {
