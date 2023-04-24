@@ -307,12 +307,18 @@ class TestJSON {
     data class Student(
         val number: Int,
         val name: String,
-        //val type: StudentType? = null,
+        val type: StudentType? = null,
         val birth: String? = null,
         val height: Double,
         val courses: Collection<String>,
         val scores: Map<String, Int>,
-        val valid: Boolean
+        val valid: Boolean,
+        val professor: Professor
+    )
+
+    data class Professor(
+        val age: Int,
+        val name: String
     )
 
     enum class StudentType {
@@ -320,9 +326,11 @@ class TestJSON {
     }
 
     @Test
-    fun testJsonGenerator(){
-        val student = Student(1, "eu", null, 1.73, listOf("MEC","ROB","TAM","MER","BOA"),
-            mapOf("MEC" to 1, "ROB" to 2,"TAM" to 3,"MER" to 4,"BOA" to 5), true)
+    fun testJsonGenerator() {
+        val student = Student(1, "eu", StudentType.Bachelor, null, 1.73, listOf("MEC","ROB","TAM","MER","BOA"),
+            mapOf("MEC" to 1, "ROB" to 2,"TAM" to 3,"MER" to 4,"BOA" to 5), true, Professor(40, "Pedro")
+        )
+
         val json = JSONGenerator.generateJSON(student)
 
         val required = JSONObject(mutableListOf(JSONProperty("number", JSONNumber(1)), JSONProperty("name", JSONString("eu")),
@@ -330,7 +338,8 @@ class TestJSON {
                 mutableListOf(JSONString("MEC"),JSONString("ROB"),JSONString("TAM"),JSONString("MER"),JSONString("BOA")))),
             JSONProperty("scores", JSONObject(mutableListOf(JSONProperty("MEC", JSONNumber(1)), JSONProperty("ROB", JSONNumber(2)),
                 JSONProperty("TAM", JSONNumber(3)), JSONProperty("MER", JSONNumber(4)), JSONProperty("BOA", JSONNumber(5))))),
-            JSONProperty("valid", JSONBoolean(true))))
+            JSONProperty("valid", JSONBoolean(true)), JSONProperty("professor", JSONObject(mutableListOf(JSONProperty("age", JSONNumber(40)),
+                JSONProperty("name", JSONString("Pedro"))))), JSONProperty("type", JSONString("Bachelor"))))
 
         required.value.sortBy { it.getName() }
 
