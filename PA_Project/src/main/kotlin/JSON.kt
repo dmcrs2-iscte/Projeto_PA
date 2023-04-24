@@ -63,12 +63,16 @@ data class JSONProperty(internal val name: String, internal val element: JSONEle
     override fun toString(): String {
         return "\"$name\":$element"
     }
+
+    fun getName(): String{
+        return name
+    }
 }
 
 
 data class JSONString(override val value: String): JSONLeaf {
     override fun toString(): String {
-        return "\"$value"
+        return "\"$value\""
     }
 }
 

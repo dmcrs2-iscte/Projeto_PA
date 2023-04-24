@@ -303,4 +303,23 @@ class TestJSON {
         assertFalse(obj2.isStructuredArray("Inscritos"))
         assertFalse(obj3.isStructuredArray("Inscritos"))
     }
+
+    @Test
+    fun testJsonGenerator(){
+        val student = Student(1, "eu", null, 1.73, listOf("MEC","ROB","TAM","MER","BOA"),
+            mapOf("MEC" to 1, "ROB" to 2,"TAM" to 3,"MER" to 4,"BOA" to 5), true)
+        val generator = JSONGenerator()
+        val json = generator.generateJSON(student)
+
+        val required = JSONObject(mutableListOf(JSONProperty("number", JSONNumber(1)), JSONProperty("name", JSONString("eu")),
+            JSONProperty("birth", JSONEmpty()), JSONProperty("height", JSONFloat(1.73f)), JSONProperty("courses", JSONArray(
+                mutableListOf(JSONString("MEC"),JSONString("ROB"),JSONString("TAM"),JSONString("MER"),JSONString("BOA")))),
+            JSONProperty("scores", JSONObject(mutableListOf(JSONProperty("MEC", JSONNumber(1)), JSONProperty("ROB", JSONNumber(2)),
+                JSONProperty("TAM", JSONNumber(3)), JSONProperty("MER", JSONNumber(4)), JSONProperty("BOA", JSONNumber(5))))),
+            JSONProperty("valid", JSONBoolean(true))))
+
+        required.value.sortBy { it.getName() }
+
+        assertEquals(required, json)
+    }
 }
