@@ -305,7 +305,7 @@ class TestJSON {
     }
 
     data class Student(
-        //@JSONGenerator.AsJSONString
+        @JSONGenerator.AsJSONString
         val number: Int,
         val name: String,
         val type: StudentType? = null,
@@ -325,7 +325,7 @@ class TestJSON {
     )
 
     enum class StudentType {
-        Bachelor, Master, Doctoral
+        Bachelor//, Master, Doctoral
     }
 
     @Test
@@ -337,7 +337,7 @@ class TestJSON {
 
         val json = JSONGenerator.generateJSON(student)
 
-        val required = JSONObject(mutableListOf(JSONProperty("number", JSONNumber(1)), JSONProperty("name", JSONString("eu")),
+        val required = JSONObject(mutableListOf(JSONProperty("number", JSONString("1")), JSONProperty("name", JSONString("eu")),
             JSONProperty("birth", JSONEmpty()), JSONProperty("height", JSONFloat(1.73f)), JSONProperty("courses", JSONArray(
                 mutableListOf(JSONString("MEC"),JSONString("ROB"),JSONString("TAM"),JSONString("MER"),JSONString("BOA")))),
             JSONProperty("scores", JSONObject(mutableListOf(JSONProperty("MEC", JSONNumber(1)), JSONProperty("ROB", JSONNumber(2)),

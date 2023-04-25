@@ -27,28 +27,35 @@ class JSONGenerator {
                 else if (jsonNode is JSONArray) jsonNode.addElement(element)
             }
 
-            when (value) {
-                null -> addToObject(JSONEmpty())
-                annotations.any { it.annotationClass == AsJSONString::class } ->
-                    addToObject(JSONString(value.toString()))
-                is Number -> {
-                    if (value.toDouble() == value.toInt().toDouble()) addToObject(JSONNumber(value.toInt()))
-                    else addToObject(JSONFloat(value.toFloat()))
+            if (annotations.any { it.annotationClass == AsJSONString::class }) {
+                when (value) {
+                    null -> addToObject(JSONString("null"))
+                    else -> addToObject(JSONString(value.toString()))
                 }
-                is Boolean -> addToObject(JSONBoolean(value))
-                is Char, is String -> addToObject(JSONString(value.toString()))
-                is Iterable<*> -> {
-                    val array = JSONArray()
-                    value.forEach { assignJSONTypes(array, value=it, annotations=emptyList()) }
-                    addToObject(array)
+            } else {
+                when (value) {
+                    null -> addToObject(JSONEmpty())
+                    annotations.any { it.annotationClass == AsJSONString::class } ->
+                        addToObject(JSONString(value.toString()))
+                    is Number -> {
+                        if (value.toDouble() == value.toInt().toDouble()) addToObject(JSONNumber(value.toInt()))
+                        else addToObject(JSONFloat(value.toFloat()))
+                    }
+                    is Boolean -> addToObject(JSONBoolean(value))
+                    is Char, is String -> addToObject(JSONString(value.toString()))
+                    is Iterable<*> -> {
+                        val array = JSONArray()
+                        value.forEach { assignJSONTypes(array, value=it, annotations=emptyList()) }
+                        addToObject(array)
+                    }
+                    is Map<*, *> -> {
+                        val o = JSONObject()
+                        value.forEach { (k, v) -> assignJSONTypes(o, k.toString(), v, annotations=emptyList()) }
+                        addToObject(o)
+                    }
+                    is Enum<*> -> addToObject(JSONString(value.toString()))
+                    else -> addToObject(generateJSON(value))
                 }
-                is Map<*, *> -> {
-                    val o = JSONObject()
-                    value.forEach { (k, v) -> assignJSONTypes(o, k.toString(), v, annotations=emptyList()) }
-                    addToObject(o)
-                }
-                is Enum<*> -> addToObject(JSONString(value.toString()))
-                else -> addToObject(generateJSON(value))
             }
         }
     }
