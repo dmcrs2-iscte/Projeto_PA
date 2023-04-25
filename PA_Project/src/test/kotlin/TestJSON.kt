@@ -1,7 +1,4 @@
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class TestJSON {
 
@@ -27,6 +24,7 @@ class TestJSON {
             )
         )
         assertEquals(jsonObject, newObject)
+        assertFailsWith<IllegalArgumentException> { jsonObject.addElement(JSONProperty("newString", jsonEmpty)) }
     }
 
     @Test

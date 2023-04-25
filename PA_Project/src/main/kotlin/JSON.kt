@@ -89,7 +89,10 @@ data class JSONEmpty(override val value: Nothing? = null): JSONLeaf {
 }
 
 data class JSONObject(override val value: MutableList<JSONProperty> = mutableListOf()): JSONNode<JSONProperty> {
-    fun addElement(element: JSONProperty) = value.add(element)
+    fun addElement(element: JSONProperty){
+        if(value.any { it.name == element.name }) throw IllegalArgumentException("A JSONProperty with name '${element.name}' already exists inside this JSONObject")
+        else value.add(element)
+    }
 
     override fun accept(v: JSONVisitor) {
         if (v.visit(this)) value.forEach { it.accept(v) }
