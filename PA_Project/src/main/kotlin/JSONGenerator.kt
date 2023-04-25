@@ -1,4 +1,3 @@
-import kotlin.reflect.KClass
 import kotlin.reflect.full.memberProperties
 
 class JSONGenerator {
@@ -6,7 +5,10 @@ class JSONGenerator {
     annotation class ExcludeFromJSON
 
     @Target(AnnotationTarget.PROPERTY)
-    annotation class AsJSONString(val value: KClass<*> = String::class)
+    annotation class AsJSONString
+
+    @Target(AnnotationTarget.PROPERTY)
+    annotation class UseName(val name: String)
 
     companion object GenerateJSON {
         fun generateJSON(instance: Any): JSONObject {
@@ -15,7 +17,12 @@ class JSONGenerator {
             properties.forEach { p ->
                 if (p.annotations.none { it.annotationClass == ExcludeFromJSON::class }) {
                     val value = p.call(instance)
-                    assignJSONTypes(jsonObject, p.name, value, p.annotations)
+                    if (p.annotations.any { it.annotationClass == UseName::class }) {
+                        val useNameAnnotation = p.annotations.first { it.annotationClass == UseName::class } as UseName
+                        assignJSONTypes(jsonObject, useNameAnnotation.name, value, p.annotations)
+                    } else {
+                        assignJSONTypes(jsonObject, p.name, value, p.annotations)
+                    }
                 }
             }
             return jsonObject
