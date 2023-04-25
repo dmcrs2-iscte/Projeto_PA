@@ -306,6 +306,7 @@ class TestJSON {
 
     data class Student(
         @JSONGenerator.AsJSONString
+        @JSONGenerator.UseName("newName")
         val number: Int,
         val name: String,
         val type: StudentType? = null,
@@ -337,7 +338,7 @@ class TestJSON {
 
         val json = JSONGenerator.generateJSON(student)
 
-        val required = JSONObject(mutableListOf(JSONProperty("number", JSONString("1")), JSONProperty("name", JSONString("eu")),
+        val expected = JSONObject(mutableListOf(JSONProperty("newName", JSONString("1")), JSONProperty("name", JSONString("eu")),
             JSONProperty("birth", JSONEmpty()), JSONProperty("height", JSONFloat(1.73f)), JSONProperty("courses", JSONArray(
                 mutableListOf(JSONString("MEC"),JSONString("ROB"),JSONString("TAM"),JSONString("MER"),JSONString("BOA")))),
             JSONProperty("scores", JSONObject(mutableListOf(JSONProperty("MEC", JSONNumber(1)), JSONProperty("ROB", JSONNumber(2)),
@@ -345,8 +346,8 @@ class TestJSON {
             JSONProperty("valid", JSONBoolean(true)), JSONProperty("professor", JSONObject(mutableListOf(JSONProperty("age", JSONNumber(40)),
                 JSONProperty("name", JSONString("Pedro"))))), JSONProperty("type", JSONString("Bachelor"))))
 
-        required.value.sortBy { it.getName() }
+        expected.value.sortBy { it.getName() }
 
-        assertEquals(required, json)
+        assertEquals(expected, json)
     }
 }
