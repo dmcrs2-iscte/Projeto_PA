@@ -296,7 +296,7 @@ class TestJSON {
                 )
             )
         )
-
+        
         assertTrue(obj1.isStructuredArray("Inscritos"))
         assertFalse(obj2.isStructuredArray("Inscritos"))
         assertFalse(obj3.isStructuredArray("Inscritos"))
