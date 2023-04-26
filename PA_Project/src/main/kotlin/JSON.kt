@@ -37,7 +37,7 @@ sealed interface JSONNode<T>: JSONElement {
 
     fun areNumbers(name: String): Boolean = this.arePropertiesOfType(name) { it is Int }
 
-    fun areFloats(name: String): Boolean = this.arePropertiesOfType(name) { it is Float }
+    fun areFloats(name: String): Boolean = this.arePropertiesOfType(name) { it is Double }
 
     fun areNulls(name: String): Boolean = this.arePropertiesOfType(name) { it == null }
 
@@ -80,7 +80,7 @@ data class JSONBoolean(override val value: Boolean): JSONLeaf {
     override fun toString() = value.toString()
 }
 
-data class JSONFloat(override val value: Float): JSONLeaf {
+data class JSONFloat(override val value: Double): JSONLeaf {
     override fun toString() = value.toString()
 }
 

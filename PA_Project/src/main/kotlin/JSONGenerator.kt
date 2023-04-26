@@ -1,3 +1,4 @@
+import java.lang.IllegalArgumentException
 import kotlin.reflect.full.memberProperties
 
 class JSONGenerator {
@@ -12,6 +13,7 @@ class JSONGenerator {
 
     companion object GenerateJSON {
         fun generateJSON(instance: Any): JSONObject {
+            if (!instance::class.isData) throw IllegalArgumentException("Argument is not an object of data class")
             val jsonObject = JSONObject()
             val properties = instance::class.memberProperties
             properties.forEach { p ->
@@ -44,7 +46,7 @@ class JSONGenerator {
                     null -> addToNode(JSONEmpty())
                     is Number -> {
                         if (value.toDouble() == value.toInt().toDouble()) addToNode(JSONNumber(value.toInt()))
-                        else addToNode(JSONFloat(value.toFloat()))
+                        else addToNode(JSONFloat(value.toDouble()))
                     }
                     is Boolean -> addToNode(JSONBoolean(value))
                     is Char, is String -> addToNode(JSONString(value.toString()))

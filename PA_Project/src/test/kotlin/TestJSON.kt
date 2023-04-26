@@ -6,7 +6,7 @@ class TestJSON {
     private val jsonNumber = JSONNumber(123)
     private val jsonBoolean = JSONBoolean(true)
     private val jsonEmpty = JSONEmpty()
-    private val jsonFloat = JSONFloat(1.23f)
+    private val jsonFloat = JSONFloat(1.23)
 
     private val jsonObject1 = JSONObject(mutableListOf(JSONProperty("jsonString", jsonString), JSONProperty("jsonNumber", jsonNumber)))
     private val jsonArray = JSONArray(mutableListOf(jsonObject1, jsonBoolean, jsonEmpty))
@@ -100,7 +100,7 @@ class TestJSON {
                                     JSONProperty("numero", JSONNumber(1)),
                                     JSONProperty("nome", JSONString("eu")),
                                     JSONProperty("docente", JSONBoolean(true)),
-                                    JSONProperty("altura", JSONFloat(1.73f))
+                                    JSONProperty("altura", JSONFloat(1.73))
                                 )
                             ),
                             JSONObject(
@@ -114,7 +114,7 @@ class TestJSON {
                                     JSONProperty("numero", JSONNumber(3)),
                                     JSONProperty("nome", JSONString("tu")),
                                     JSONProperty("data", JSONEmpty()),
-                                    JSONProperty("altura", JSONFloat(1.74f))
+                                    JSONProperty("altura", JSONFloat(1.74))
                                 )
                             )
                         )
@@ -126,7 +126,7 @@ class TestJSON {
                             JSONProperty("numero", JSONNumber(3)),
                             JSONProperty("nome", JSONString("tu")),
                             JSONProperty("data", JSONEmpty()),
-                            JSONProperty("altura", JSONFloat(1.74f))
+                            JSONProperty("altura", JSONFloat(1.74))
                         )
                     ))
             )
@@ -142,7 +142,7 @@ class TestJSON {
                                     JSONProperty("numero", JSONNumber(1)),
                                     JSONProperty("nome", JSONString("eu")),
                                     JSONProperty("docente", JSONBoolean(true)),
-                                    JSONProperty("altura", JSONFloat(1.73f))
+                                    JSONProperty("altura", JSONFloat(1.73))
                                 )
                             ),
                             JSONObject(
@@ -205,7 +205,7 @@ class TestJSON {
                                     JSONProperty("numero", JSONNumber(1)),
                                     JSONProperty("nome", JSONString("eu")),
                                     JSONProperty("docente", JSONBoolean(true)),
-                                    JSONProperty("altura", JSONFloat(1.73f))
+                                    JSONProperty("altura", JSONFloat(1.73))
                                 )
                             ),
                             JSONObject(
@@ -213,7 +213,7 @@ class TestJSON {
                                     JSONProperty("numero", JSONNumber(1)),
                                     JSONProperty("nome", JSONString("eu")),
                                     JSONProperty("docente", JSONBoolean(true)),
-                                    JSONProperty("altura", JSONFloat(1.73f))
+                                    JSONProperty("altura", JSONFloat(1.73))
                                 )
                             ),
                             JSONObject(
@@ -221,7 +221,7 @@ class TestJSON {
                                     JSONProperty("numero", JSONNumber(1)),
                                     JSONProperty("nome", JSONString("eu")),
                                     JSONProperty("docente", JSONBoolean(true)),
-                                    JSONProperty("altura", JSONFloat(1.73f))
+                                    JSONProperty("altura", JSONFloat(1.73))
                                 )
                             )
                         )
@@ -240,7 +240,7 @@ class TestJSON {
                                     JSONProperty("numero", JSONNumber(1)),
                                     JSONProperty("nome", JSONString("eu")),
                                     JSONProperty("docente", JSONBoolean(true)),
-                                    JSONProperty("altura", JSONFloat(1.73f))
+                                    JSONProperty("altura", JSONFloat(1.73))
                                 )
                             ),
                             JSONObject(
@@ -254,7 +254,7 @@ class TestJSON {
                                     JSONProperty("numero", JSONNumber(3)),
                                     JSONProperty("nome", JSONString("tu")),
                                     JSONProperty("data", JSONEmpty()),
-                                    JSONProperty("altura", JSONFloat(1.74f))
+                                    JSONProperty("altura", JSONFloat(1.74))
                                 )
                             )
                         )
@@ -273,7 +273,7 @@ class TestJSON {
                                     JSONProperty("numero", JSONNumber(1)),
                                     JSONProperty("nome", JSONString("eu")),
                                     JSONProperty("docente", JSONBoolean(true)),
-                                    JSONProperty("altura", JSONFloat(1.73f))
+                                    JSONProperty("altura", JSONFloat(1.73))
                                 )
                             ),
                             JSONObject(
@@ -287,7 +287,7 @@ class TestJSON {
                                     JSONProperty("numero", JSONNumber(3)),
                                     JSONProperty("nome", JSONString("tu")),
                                     JSONProperty("data", JSONEmpty()),
-                                    JSONProperty("altura", JSONFloat(1.74f))
+                                    JSONProperty("altura", JSONFloat(1.74))
                                 )
                             ),
                             JSONEmpty()
@@ -338,7 +338,7 @@ class TestJSON {
         val json = JSONGenerator.generateJSON(student)
 
         val expected = JSONObject(mutableListOf(JSONProperty("newName", JSONString("1")), JSONProperty("name", JSONString("eu")),
-            JSONProperty("birth", JSONEmpty()), JSONProperty("height", JSONFloat(1.73f)), JSONProperty("courses", JSONArray(
+            JSONProperty("birth", JSONEmpty()), JSONProperty("height", JSONFloat(1.73)), JSONProperty("courses", JSONArray(
                 mutableListOf(JSONString("MEC"),JSONString("ROB"),JSONString("TAM"),JSONString("MER"),JSONString("BOA")))),
             JSONProperty("scores", JSONObject(mutableListOf(JSONProperty("MEC", JSONNumber(1)), JSONProperty("ROB", JSONNumber(2)),
                 JSONProperty("TAM", JSONNumber(3)), JSONProperty("MER", JSONNumber(4)), JSONProperty("BOA", JSONNumber(5))))),
