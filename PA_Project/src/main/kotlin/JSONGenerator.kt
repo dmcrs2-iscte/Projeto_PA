@@ -1,5 +1,5 @@
 import java.lang.IllegalArgumentException
-import kotlin.reflect.full.memberProperties
+import kotlin.reflect.full.declaredMemberProperties
 
 class JSONGenerator {
     @Target(AnnotationTarget.PROPERTY)
@@ -15,7 +15,7 @@ class JSONGenerator {
         fun generateJSON(instance: Any): JSONObject {
             if (!instance::class.isData) throw IllegalArgumentException("Argument is not an object of data class")
             val jsonObject = JSONObject()
-            val properties = instance::class.memberProperties
+            val properties = instance::class.declaredMemberProperties
             properties.forEach { p ->
                 if (p.annotations.none { it.annotationClass == ExcludeFromJSON::class }) {
                     val value = p.call(instance)
