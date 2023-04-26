@@ -314,6 +314,7 @@ class TestJSON {
         val scores: Map<String, Int>,
         val valid: Boolean,
         val professor: Professor,
+        val adse: Char? = null,
         @JSONGenerator.ExcludeFromJSON
         val toExclude: String
     )
@@ -330,7 +331,7 @@ class TestJSON {
     @Test
     fun testJsonGenerator() {
         val student = Student(1, "eu", StudentType.Bachelor, null, 1.73, listOf("MEC","ROB","TAM","MER","BOA"),
-            mapOf("MEC" to 1, "ROB" to 2,"TAM" to 3,"MER" to 4,"BOA" to 5), true, Professor(40, "Pedro"),
+            mapOf("MEC" to 1, "ROB" to 2,"TAM" to 3,"MER" to 4,"BOA" to 5), true, Professor(40, "Pedro"), 'a',
             "WillBeExcluded"
         )
 
@@ -342,7 +343,7 @@ class TestJSON {
             JSONProperty("scores", JSONObject(mutableListOf(JSONProperty("MEC", JSONNumber(1)), JSONProperty("ROB", JSONNumber(2)),
                 JSONProperty("TAM", JSONNumber(3)), JSONProperty("MER", JSONNumber(4)), JSONProperty("BOA", JSONNumber(5))))),
             JSONProperty("valid", JSONBoolean(true)), JSONProperty("professor", JSONObject(mutableListOf(JSONProperty("age", JSONNumber(40)),
-                JSONProperty("name", JSONString("Pedro"))))), JSONProperty("type", JSONString("Bachelor"))))
+                JSONProperty("name", JSONString("Pedro"))))), JSONProperty("adse", JSONString("a")), JSONProperty("type", JSONString("Bachelor"))))
 
         expected.value.sortBy { it.getName() }
 

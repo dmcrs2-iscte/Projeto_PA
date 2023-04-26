@@ -42,8 +42,6 @@ class JSONGenerator {
             } else {
                 when (value) {
                     null -> addToNode(JSONEmpty())
-                    annotations.any { it.annotationClass == AsJSONString::class } ->
-                        addToNode(JSONString(value.toString()))
                     is Number -> {
                         if (value.toDouble() == value.toInt().toDouble()) addToNode(JSONNumber(value.toInt()))
                         else addToNode(JSONFloat(value.toFloat()))
