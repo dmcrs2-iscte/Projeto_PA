@@ -1,5 +1,5 @@
 sealed interface JSONVisitor {
-    fun visit(n: JSONNode<*>): Boolean = true
+    fun visit(n: JSONNode): Boolean = true
 
     fun visit(l: JSONLeaf) {}
 

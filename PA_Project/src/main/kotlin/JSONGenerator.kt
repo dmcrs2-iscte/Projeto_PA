@@ -30,7 +30,7 @@ class JSONGenerator {
             return jsonObject
         }
 
-        private fun assignJSONTypes(jsonNode: JSONNode<*>, name: String="", value: Any?, annotations: List<Annotation>) {
+        private fun assignJSONTypes(jsonNode: JSONNode, name: String="", value: Any?, annotations: List<Annotation>) {
             fun addToNode(element: JSONElement) {
                 if (jsonNode is JSONObject) jsonNode.addElement(JSONProperty(name, element))
                 else if (jsonNode is JSONArray) jsonNode.addElement(element)

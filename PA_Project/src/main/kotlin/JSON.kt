@@ -10,8 +10,8 @@ sealed interface JSONLeaf: JSONElement{
     override fun accept(v: JSONVisitor) = v.visit(this)
 }
 
-sealed interface JSONNode<T>: JSONElement {
-    override val value: MutableList<T>
+sealed interface JSONNode: JSONElement {
+    override val value: MutableList<*>
 
     fun getValuesByName(name: String): MutableList<JSONElement> {
         val visitor = GetValuesByName(name)
@@ -88,7 +88,7 @@ data class JSONEmpty(override val value: Nothing? = null): JSONLeaf {
     override fun toString() = "null"
 }
 
-data class JSONObject(override val value: MutableList<JSONProperty> = mutableListOf()): JSONNode<JSONProperty> {
+data class JSONObject(override val value: MutableList<JSONProperty> = mutableListOf()): JSONNode {
     fun addElement(element: JSONProperty){
         if(value.any { it.name == element.name }) throw IllegalArgumentException("A JSONProperty with name '${element.name}' already exists inside this JSONObject")
         else value.add(element)
@@ -101,7 +101,7 @@ data class JSONObject(override val value: MutableList<JSONProperty> = mutableLis
     override fun toString() = value.joinToString (prefix = "{", postfix = "}")
 }
 
-data class JSONArray(override val value: MutableList<JSONElement> = mutableListOf()) : JSONNode<JSONElement> {
+data class JSONArray(override val value: MutableList<JSONElement> = mutableListOf()) : JSONNode {
     fun addElement(element: JSONElement) = value.add(element)
 
     override fun accept(v: JSONVisitor) {
