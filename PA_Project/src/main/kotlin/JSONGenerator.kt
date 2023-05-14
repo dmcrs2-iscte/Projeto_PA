@@ -1,7 +1,7 @@
 import java.lang.IllegalArgumentException
 import kotlin.reflect.full.declaredMemberProperties
 
-class JSONGenerator {
+class JSONGenerator : Subject {
     @Target(AnnotationTarget.PROPERTY)
     annotation class ExcludeFromJSON
 
@@ -10,6 +10,8 @@ class JSONGenerator {
 
     @Target(AnnotationTarget.PROPERTY)
     annotation class UseName(val name: String)
+
+    private val observers = mutableListOf<Observer>()
 
     companion object GenerateJSON {
         fun generateJSON(instance: Any): JSONObject {
@@ -67,4 +69,15 @@ class JSONGenerator {
         }
     }
 
+    override fun addObserver(observer: Observer) {
+        observers.add(observer)
+    }
+
+    override fun removeObserver(observer: Observer) {
+        observers.remove(observer)
+    }
+
+    override fun notifyObservers() {
+        observers.forEach { it.update(this) }
+    }
 }

@@ -4,7 +4,7 @@ sealed interface JSONElement {
     fun accept(v: JSONVisitor)
 }
 
-sealed interface JSONLeaf: JSONElement{
+sealed interface JSONLeaf: JSONElement {
     override val value: Any?
 
     override fun accept(v: JSONVisitor) = v.visit(this)
