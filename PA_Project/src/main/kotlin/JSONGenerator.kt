@@ -1,7 +1,7 @@
 import java.lang.IllegalArgumentException
 import kotlin.reflect.full.declaredMemberProperties
 
-class JSONGenerator : Subject {
+class JSONGenerator(private val jsonObject: JSONObject = JSONObject()) : Subject {
     @Target(AnnotationTarget.PROPERTY)
     annotation class ExcludeFromJSON
 
@@ -32,7 +32,7 @@ class JSONGenerator : Subject {
             return jsonObject
         }
 
-        private fun assignJSONTypes(jsonNode: JSONNode, name: String="", value: Any?, annotations: List<Annotation>) {
+        private fun assignJSONTypes(jsonNode: JSONNode, name: String = "", value: Any?, annotations: List<Annotation>) {
             fun addToNode(element: JSONElement) {
                 if (jsonNode is JSONObject) jsonNode.addElement(JSONProperty(name, element))
                 else if (jsonNode is JSONArray) jsonNode.addElement(element)
@@ -50,18 +50,21 @@ class JSONGenerator : Subject {
                         if (value.toDouble() == value.toInt().toDouble()) addToNode(JSONNumber(value.toInt()))
                         else addToNode(JSONFloat(value.toDouble()))
                     }
+
                     is Boolean -> addToNode(JSONBoolean(value))
                     is Char, is String -> addToNode(JSONString(value.toString()))
                     is Iterable<*> -> {
                         val array = JSONArray()
-                        value.forEach { assignJSONTypes(array, value=it, annotations=emptyList()) }
+                        value.forEach { assignJSONTypes(array, value = it, annotations = emptyList()) }
                         addToNode(array)
                     }
+
                     is Map<*, *> -> {
                         val o = JSONObject()
-                        value.forEach { (k, v) -> assignJSONTypes(o, k.toString(), v, annotations=emptyList()) }
+                        value.forEach { (k, v) -> assignJSONTypes(o, k.toString(), v, annotations = emptyList()) }
                         addToNode(o)
                     }
+
                     is Enum<*> -> addToNode(JSONString(value.toString()))
                     else -> addToNode(generateJSON(value))
                 }
@@ -79,5 +82,9 @@ class JSONGenerator : Subject {
 
     override fun notifyObservers() {
         observers.forEach { it.update(this) }
+    }
+
+    internal fun addElement(instance: Any) {
+
     }
 }
