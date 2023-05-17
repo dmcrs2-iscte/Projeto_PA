@@ -58,6 +58,22 @@ sealed interface JSONNode: JSONElement {
         this.accept(visitor)
         return visitor.isValid()
     }
+
+    fun toTree(tabs: Int = 1): String {
+        fun getIndentation(tbs: Int): String = "\n" + "\t".repeat(tbs)
+
+        var jsonToString = if (this is JSONObject) "{" else "["
+        value.forEach { jsonToString += getIndentation(tabs) +
+            when (it) {
+                is JSONNode -> it.toTree(tabs + 1)
+                is JSONProperty -> it.toTree(tabs) + ","
+                else -> it.toString() + ","
+            }
+        }
+        jsonToString = jsonToString.dropLast(1)
+        jsonToString += getIndentation(tabs - 1) + if (this is JSONObject) "}" else "]"
+        return jsonToString
+    }
 }
 
 data class JSONProperty(internal val name: String, internal val element: JSONElement) {

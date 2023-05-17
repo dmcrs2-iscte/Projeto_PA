@@ -86,5 +86,4 @@ class UI {
             })
             add(text)
         }
-
 }
