@@ -7,10 +7,10 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.*
 
-class UI : Observer {
-    override fun update(subject: Subject) {
-        TODO("Not yet implemented")
-    }
+class UI {
+
+    private var objectFromMediator = JSONObject()
+
 
     val frame = JFrame("Josue - JSON Object Editor").apply {
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE
@@ -52,7 +52,7 @@ class UI : Observer {
                         val add = JButton("add")
                         add.addActionListener {
                             val text = JOptionPane.showInputDialog("text")
-                            add(testWidget(text, "?"))
+                            add(testWidget(text, "N/A"))
                             menu.isVisible = false
                             revalidate()
                             frame.repaint()
@@ -89,4 +89,5 @@ class UI : Observer {
             })
             add(text)
         }
+
 }

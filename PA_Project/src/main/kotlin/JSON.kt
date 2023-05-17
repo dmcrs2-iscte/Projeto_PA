@@ -13,6 +13,10 @@ sealed interface JSONLeaf: JSONElement {
 sealed interface JSONNode: JSONElement {
     override val value: MutableList<*>
 
+    val observers: MutableList<JSONObserver>
+
+    fun addObserver(observer: JSONObserver) = observers.add(observer)
+
     fun getValuesByName(name: String): MutableList<JSONElement> {
         val visitor = GetValuesByName(name)
         this.accept(visitor)
@@ -109,4 +113,10 @@ data class JSONArray(override val value: MutableList<JSONElement> = mutableListO
     }
 
     override fun toString() = value.joinToString(prefix = "[", postfix = "]")
+}
+
+interface JSONObserver {
+    fun elementAdded()
+    fun elementRemoved()
+    fun elementReplaced()
 }

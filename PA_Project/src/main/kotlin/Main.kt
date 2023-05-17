@@ -1,10 +1,12 @@
 fun main() {
-    val jsonGenerator = JSONGenerator()
-    val mediator = Mediator()
-    jsonGenerator.addObserver(mediator)
+    val list = mutableListOf<Int>()
+
+    list.add(1)
+    list.add(9)
+    println(list.add(1,7))
 
     val ui = UI()
-    mediator.addObserver(ui)
+
 
     ui.open()
 }
