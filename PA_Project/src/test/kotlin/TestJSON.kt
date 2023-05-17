@@ -337,7 +337,7 @@ class TestJSON {
 
         val json = JSONGenerator.generateJSON(student)
 
-        val expected = JSONObject(mutableListOf(JSONProperty("newName", JSONString("1")), JSONProperty("name", JSONString("eu")),
+        val preExpected = JSONObject(mutableListOf(JSONProperty("newName", JSONString("1")), JSONProperty("name", JSONString("eu")),
             JSONProperty("birth", JSONEmpty()), JSONProperty("height", JSONFloat(1.73)), JSONProperty("courses", JSONArray(
                 mutableListOf(JSONString("MEC"),JSONString("ROB"),JSONString("TAM"),JSONString("MER"),JSONString("BOA")))),
             JSONProperty("scores", JSONObject(mutableListOf(JSONProperty("MEC", JSONNumber(1)), JSONProperty("ROB", JSONNumber(2)),
@@ -345,7 +345,9 @@ class TestJSON {
             JSONProperty("valid", JSONBoolean(true)), JSONProperty("professor", JSONObject(mutableListOf(JSONProperty("age", JSONNumber(40)),
                 JSONProperty("name", JSONString("Pedro"))))), JSONProperty("adse", JSONString("a")), JSONProperty("type", JSONString("Bachelor"))))
 
-        expected.value.sortBy { it.getName() }
+        val expected = JSONObject( preExpected.value.sortedBy { it.getName() }.toMutableList())
+
+        println(json.toTree())
 
         assertEquals(expected, json)
     }

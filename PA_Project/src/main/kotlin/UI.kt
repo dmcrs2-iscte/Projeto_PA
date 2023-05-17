@@ -9,9 +9,6 @@ import javax.swing.*
 
 class UI {
 
-    private var objectFromMediator = JSONObject()
-
-
     val frame = JFrame("Josue - JSON Object Editor").apply {
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         layout = GridLayout(0, 2)

@@ -1,0 +1,6 @@
+class EditorView {
+}
+
+interface EditorViewObserver {
+
+}

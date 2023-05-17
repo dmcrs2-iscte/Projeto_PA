@@ -11,7 +11,7 @@ sealed interface JSONLeaf: JSONElement {
 }
 
 sealed interface JSONNode: JSONElement {
-    override val value: MutableList<*>
+    override val value: List<*>
 
     val observers: MutableList<JSONObserver>
 
@@ -69,6 +69,10 @@ data class JSONProperty(internal val name: String, internal val element: JSONEle
 
     fun getName(): String = name
     fun getElement(): JSONElement = element
+
+    internal fun toTree(tabs: Int): String{
+        return name + " : " + if(element is JSONNode) element.toTree(tabs+1) else element.toString()
+    }
 }
 
 
@@ -92,54 +96,59 @@ data class JSONEmpty(override val value: Nothing? = null): JSONLeaf {
     override fun toString() = "null"
 }
 
-data class JSONObject(override val value: MutableList<JSONProperty> = mutableListOf()): JSONNode {
+data class JSONObject(private val mutableValue: MutableList<JSONProperty> = mutableListOf()): JSONNode {
+
+    override val value: List<JSONProperty> get() = mutableValue.toList()
     override val observers: MutableList<JSONObserver> = mutableListOf()
 
     fun addElement(element: JSONProperty) {
-        if (value.any { it.name == element.name }) throw IllegalArgumentException("A JSONProperty with name '${element.name}' already exists inside this JSONObject")
-        else if (value.add(element)) observers.forEach { it.elementAdded() }
+        if (mutableValue.any { it.name == element.name }) throw IllegalArgumentException("A JSONProperty with name '${element.name}' already exists inside this JSONObject")
+        else if (mutableValue.add(element)) observers.forEach { it.elementAdded() }
     }
 
     fun removeElement(element: JSONProperty) {
-        if (value.remove(element)) observers.forEach { it.elementRemoved() }
+        if (mutableValue.remove(element)) observers.forEach { it.elementRemoved() }
     }
 
     fun replaceElement(oldElement: JSONProperty, newElement: JSONElement) {
-        val index = value.indexOf(oldElement)
+        val index = mutableValue.indexOf(oldElement)
         val newProperty = JSONProperty(oldElement.name, newElement)
-        value[index] = newProperty
+        mutableValue[index] = newProperty
         observers.forEach { it.elementReplaced() }
     }
 
     override fun accept(v: JSONVisitor) {
-        if (v.visit(this)) value.forEach { it.accept(v) }
+        if (v.visit(this)) mutableValue.forEach { it.accept(v) }
     }
 
-    override fun toString() = value.joinToString (prefix = "{", postfix = "}")
+    override fun toString() = mutableValue.joinToString (prefix = "{", postfix = "}")
 }
 
-data class JSONArray(override val value: MutableList<JSONElement> = mutableListOf()): JSONNode {
+data class JSONArray(private val mutableValue: MutableList<JSONElement> = mutableListOf()): JSONNode {
+
+    override val value: List<JSONElement> get() = mutableValue.toList()
+
     override val observers: MutableList<JSONObserver> = mutableListOf()
 
     fun addElement(element: JSONElement) {
-        if (value.add(element)) observers.forEach { it.elementAdded() }
+        if (mutableValue.add(element)) observers.forEach { it.elementAdded() }
     }
 
     fun removeElement(element: JSONElement) {
-        if (value.remove(element)) observers.forEach { it.elementRemoved() }
+        if (mutableValue.remove(element)) observers.forEach { it.elementRemoved() }
     }
 
     fun replaceElement(oldElement: JSONElement, newElement: JSONElement) {
-        val index = value.indexOf(oldElement)
-        value[index] = newElement
+        val index = mutableValue.indexOf(oldElement)
+        mutableValue[index] = newElement
         observers.forEach { it.elementReplaced() }
     }
 
     override fun accept(v: JSONVisitor) {
-        if (v.visit(this)) value.forEach { it.accept(v) }
+        if (v.visit(this)) mutableValue.forEach { it.accept(v) }
     }
 
-    override fun toString() = value.joinToString(prefix = "[", postfix = "]")
+    override fun toString() = mutableValue.joinToString(prefix = "[", postfix = "]")
 }
 
 interface JSONObserver {
