@@ -13,7 +13,7 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
 
         val left = JPanel()
         left.layout = GridLayout()
-        val scrollPane = JScrollPane(testPanel()).apply {
+        val scrollPane = JScrollPane(panel()).apply {
             horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
             verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
         }
@@ -33,7 +33,19 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
         frame.isVisible = true
     }
 
-    private fun testPanel(): JPanel =
+    private fun textField(property: JSONProperty): JTextField =
+        JTextField().apply {
+            addKeyListener(object : KeyAdapter() {
+                override fun keyPressed(e: KeyEvent) {
+                    if (e.keyCode == KeyEvent.VK_ENTER) {
+                        jsonObject.replaceElement(property, jsonTypeAssigner(text))
+                        println(jsonObject.toTree())
+                    }
+                }
+            })
+        }
+
+    private fun panel(): JPanel =
         JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
@@ -90,9 +102,8 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
             val element = jsonTypeAssigner(value)
             jsonObject.addElement(JSONProperty(key, element))
 
-            val text = JTextField(value)
+            val text = textField(JSONProperty(key, element))
 
             add(text)
-            println(jsonObject.toTree())
         }
 }

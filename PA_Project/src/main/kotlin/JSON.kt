@@ -128,9 +128,10 @@ data class JSONObject(private val mutableValue: MutableList<JSONProperty> = muta
 
     fun replaceElement(oldElement: JSONProperty, newElement: JSONElement) {
         val index = mutableValue.indexOf(oldElement)
-        val newProperty = JSONProperty(oldElement.name, newElement)
-        mutableValue[index] = newProperty
-        observers.forEach { it.elementReplaced() }
+        if (index != -1) {
+            mutableValue[index] = JSONProperty(oldElement.name, newElement)
+            observers.forEach { it.elementReplaced() }
+        }
     }
 
     override fun accept(v: JSONVisitor) {
