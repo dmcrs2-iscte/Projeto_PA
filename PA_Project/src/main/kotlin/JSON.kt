@@ -70,7 +70,9 @@ sealed interface JSONNode: JSONElement {
                 else -> it.toString() + ","
             }
         }
-        jsonToString = jsonToString.dropLast(1)
+        if (this.value.isNotEmpty()) {
+            jsonToString = jsonToString.dropLast(1)
+        }
         jsonToString += getIndentation(tabs - 1) + if (this is JSONObject) "}" else "]"
         return jsonToString
     }

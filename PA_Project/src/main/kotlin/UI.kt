@@ -22,9 +22,9 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
 
         val right = JPanel()
         right.layout = GridLayout()
-        val srcArea = JTextArea()
+        val srcArea = JSONView(jsonObject)
+        srcArea.isEditable = false
         srcArea.tabSize = 2
-        srcArea.text = "TODO"
         right.add(srcArea)
         add(right)
     }
