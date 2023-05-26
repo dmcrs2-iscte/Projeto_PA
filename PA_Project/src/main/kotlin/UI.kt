@@ -1,13 +1,10 @@
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.GridLayout
-import java.awt.event.FocusAdapter
-import java.awt.event.FocusEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
+import java.awt.event.*
 import javax.swing.*
 
-class UI {
+class UI(private val jsonObject: JSONObject = JSONObject()) {
 
     val frame = JFrame("Josue - JSON Object Editor").apply {
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE
@@ -16,7 +13,7 @@ class UI {
 
         val left = JPanel()
         left.layout = GridLayout()
-        val scrollPane = JScrollPane(testPanel()).apply {
+        val scrollPane = JScrollPane(panel()).apply {
             horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
             verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
         }
@@ -25,9 +22,9 @@ class UI {
 
         val right = JPanel()
         right.layout = GridLayout()
-        val srcArea = JTextArea()
+        val srcArea = JSONView(jsonObject)
+        srcArea.isEditable = false
         srcArea.tabSize = 2
-        srcArea.text = "TODO"
         right.add(srcArea)
         add(right)
     }
@@ -36,7 +33,19 @@ class UI {
         frame.isVisible = true
     }
 
-    private fun testPanel(): JPanel =
+    private fun textField(property: JSONProperty): JTextField =
+        JTextField().apply {
+            addKeyListener(object : KeyAdapter() {
+                override fun keyPressed(e: KeyEvent) {
+                    if (e.keyCode == KeyEvent.VK_ENTER) {
+                        jsonObject.replaceElement(property, jsonTypeAssigner(text))
+                        println(jsonObject.toTree())
+                    }
+                }
+            })
+        }
+
+    private fun panel(): JPanel =
         JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
@@ -49,7 +58,7 @@ class UI {
                         val add = JButton("add")
                         add.addActionListener {
                             val text = JOptionPane.showInputDialog("text")
-                            add(testWidget(text, "N/A"))
+                            add(addWidget(text, ""))
                             menu.isVisible = false
                             revalidate()
                             frame.repaint()
@@ -71,19 +80,30 @@ class UI {
             })
         }
 
-    fun testWidget(key: String, value: String): JPanel =
+    private fun jsonTypeAssigner(value: String): JSONElement {
+        return when {
+            value.startsWith("\"") && value.endsWith("\"") -> JSONString(value)
+            value.toIntOrNull() != null -> JSONNumber(value.toInt())
+            value.toDoubleOrNull() != null -> JSONFloat(value.toDouble())
+            value.toBooleanStrictOrNull() != null -> JSONBoolean(value.toBooleanStrict())
+            value.isEmpty() -> JSONEmpty()
+            else -> JSONString(value)
+        }
+    }
+
+    fun addWidget(key: String, value: String): JPanel =
         JPanel().apply {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
             alignmentY = Component.TOP_ALIGNMENT
 
             add(JLabel(key))
-            val text = JTextField(value)
-            text.addFocusListener(object : FocusAdapter() {
-                override fun focusLost(e: FocusEvent) {
-                    println("perdeu foco: ${text.text}")
-                }
-            })
+
+            val element = jsonTypeAssigner(value)
+            jsonObject.addElement(JSONProperty(key, element))
+
+            val text = textField(JSONProperty(key, element))
+
             add(text)
         }
 }

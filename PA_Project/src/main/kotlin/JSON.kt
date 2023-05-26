@@ -70,7 +70,9 @@ sealed interface JSONNode: JSONElement {
                 else -> it.toString() + ","
             }
         }
-        jsonToString = jsonToString.dropLast(1)
+        if (this.value.isNotEmpty()) {
+            jsonToString = jsonToString.dropLast(1)
+        }
         jsonToString += getIndentation(tabs - 1) + if (this is JSONObject) "}" else "]"
         return jsonToString
     }
@@ -128,9 +130,10 @@ data class JSONObject(private val mutableValue: MutableList<JSONProperty> = muta
 
     fun replaceElement(oldElement: JSONProperty, newElement: JSONElement) {
         val index = mutableValue.indexOf(oldElement)
-        val newProperty = JSONProperty(oldElement.name, newElement)
-        mutableValue[index] = newProperty
-        observers.forEach { it.elementReplaced() }
+        if (index != -1) {
+            mutableValue[index] = JSONProperty(oldElement.name, newElement)
+            observers.forEach { it.elementReplaced() }
+        }
     }
 
     override fun accept(v: JSONVisitor) {

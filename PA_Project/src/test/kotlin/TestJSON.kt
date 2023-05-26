@@ -347,7 +347,7 @@ class TestJSON {
 
         val expected = JSONObject( preExpected.value.sortedBy { it.getName() }.toMutableList())
 
-        println(json.toTree())
+        println(JSONObject().toTree())
 
         assertEquals(expected, json)
     }
