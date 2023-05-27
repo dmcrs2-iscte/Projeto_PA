@@ -89,7 +89,7 @@ data class JSONProperty(internal val name: String, internal val element: JSONEle
     fun getElement(): JSONElement = element
 
     internal fun toTree(tabs: Int): String{
-        return name + " : " + if(element is JSONNode) element.toTree(tabs+1) else element.toString()
+        return name + " : " + if(element is JSONNode) element.toTree(tabs + 1) else element.toString()
     }
 }
 

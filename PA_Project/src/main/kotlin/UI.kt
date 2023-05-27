@@ -20,12 +20,9 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
         left.add(scrollPane)
         add(left)
 
-        val right = JPanel()
-        right.layout = GridLayout()
-        val srcArea = JSONView(jsonObject)
-        srcArea.isEditable = false
-        srcArea.tabSize = 2
-        right.add(srcArea)
+        val right = JSONView(jsonObject)
+        right.isEditable = false
+        right.tabSize = 2
         add(right)
     }
 
@@ -43,7 +40,8 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
                 override fun mouseClicked(e: MouseEvent) {
                     if (SwingUtilities.isRightMouseButton(e)) {
                         val menu = JPopupMenu("Message")
-                        val add = JButton("add")
+
+                        val add = JButton("Add")
                         add.addActionListener {
                             val text = JOptionPane.showInputDialog("text")
                             add(getWidget(text))
@@ -51,17 +49,17 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
                             revalidate()
                             frame.repaint()
                         }
-                        val del = JButton("delete all")
+                        menu.add(add)
+
+                        val del = JButton("Delete All")
                         del.addActionListener {
-                            components.forEach {
-                                remove(it)
-                            }
+                            components.forEach { remove(it) }
                             menu.isVisible = false
                             revalidate()
                             frame.repaint()
                         }
-                        menu.add(add)
                         menu.add(del)
+
                         menu.show(this@apply, 100, 100)
                     }
                 }
@@ -99,7 +97,6 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
                 override fun keyPressed(e: KeyEvent) {
                     if (e.keyCode == KeyEvent.VK_ENTER) {
                         jsonObject.replaceElement(key, jsonTypeAssigner(text))
-                        println(jsonObject.toTree())
                     }
                 }
             })
