@@ -54,6 +54,7 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
                         val del = JButton("Delete All")
                         del.addActionListener {
                             components.forEach { remove(it) }
+                            jsonObject.removeAllElements()
                             menu.isVisible = false
                             revalidate()
                             frame.repaint()
