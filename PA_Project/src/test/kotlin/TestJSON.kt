@@ -351,4 +351,22 @@ class TestJSON {
 
         assertEquals(expected, json)
     }
+
+    @Test
+    fun testJsonReplaceElement() {
+        val jsonObject = JSONObject(mutableListOf(
+            JSONProperty("a", JSONNumber(1)),
+            JSONProperty("b", JSONNumber(2)),
+            JSONProperty("c", JSONNumber(3)),
+            JSONProperty("obj", JSONObject(mutableListOf(
+                JSONProperty("x", JSONNumber(101)),
+                JSONProperty("y", JSONNumber(102)),
+                JSONProperty("z", JSONNumber(103))
+            ))
+        )))
+
+        jsonObject.replaceElement("c", JSONNumber(4))
+
+        println(jsonObject.toTree())
+    }
 }
