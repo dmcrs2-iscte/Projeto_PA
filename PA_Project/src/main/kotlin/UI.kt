@@ -13,19 +13,16 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
 
         val left = JPanel()
         left.layout = GridLayout()
-        val scrollPane = JScrollPane(panel()).apply {
+        val scrollPane = JScrollPane(getPanel()).apply {
             horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
             verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
         }
         left.add(scrollPane)
         add(left)
 
-        val right = JPanel()
-        right.layout = GridLayout()
-        val srcArea = JSONView(jsonObject)
-        srcArea.isEditable = false
-        srcArea.tabSize = 2
-        right.add(srcArea)
+        val right = JSONView(jsonObject)
+        right.isEditable = false
+        right.tabSize = 2
         add(right)
     }
 
@@ -33,19 +30,7 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
         frame.isVisible = true
     }
 
-    private fun textField(property: JSONProperty): JTextField =
-        JTextField().apply {
-            addKeyListener(object : KeyAdapter() {
-                override fun keyPressed(e: KeyEvent) {
-                    if (e.keyCode == KeyEvent.VK_ENTER) {
-                        jsonObject.replaceElement(property, jsonTypeAssigner(text))
-                        println(jsonObject.toTree())
-                    }
-                }
-            })
-        }
-
-    private fun panel(): JPanel =
+    private fun getPanel(): JPanel =
         JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
@@ -55,25 +40,26 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
                 override fun mouseClicked(e: MouseEvent) {
                     if (SwingUtilities.isRightMouseButton(e)) {
                         val menu = JPopupMenu("Message")
-                        val add = JButton("add")
+
+                        val add = JButton("Add")
                         add.addActionListener {
                             val text = JOptionPane.showInputDialog("text")
-                            add(addWidget(text, ""))
-                            menu.isVisible = false
-                            revalidate()
-                            frame.repaint()
-                        }
-                        val del = JButton("delete all")
-                        del.addActionListener {
-                            components.forEach {
-                                remove(it)
-                            }
+                            add(getWidget(text))
                             menu.isVisible = false
                             revalidate()
                             frame.repaint()
                         }
                         menu.add(add)
+
+                        val del = JButton("Delete All")
+                        del.addActionListener {
+                            components.forEach { remove(it) }
+                            menu.isVisible = false
+                            revalidate()
+                            frame.repaint()
+                        }
                         menu.add(del)
+
                         menu.show(this@apply, 100, 100)
                     }
                 }
@@ -91,7 +77,7 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
         }
     }
 
-    fun addWidget(key: String, value: String): JPanel =
+    private fun getWidget(key: String): JPanel =
         JPanel().apply {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
@@ -99,11 +85,20 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
 
             add(JLabel(key))
 
-            val element = jsonTypeAssigner(value)
-            jsonObject.addElement(JSONProperty(key, element))
+            val property = JSONProperty(key, JSONEmpty())
+            jsonObject.addElement(property)
 
-            val text = textField(JSONProperty(key, element))
+            add(getTextField(key))
+        }
 
-            add(text)
+    private fun getTextField(key: String): JTextField =
+        JTextField().apply {
+            addKeyListener(object : KeyAdapter() {
+                override fun keyPressed(e: KeyEvent) {
+                    if (e.keyCode == KeyEvent.VK_ENTER) {
+                        jsonObject.replaceElement(key, jsonTypeAssigner(text))
+                    }
+                }
+            })
         }
 }
