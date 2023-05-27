@@ -1,6 +1,6 @@
 import javax.swing.JTextArea
 
-class JSONView(private val json: JSONNode) : JTextArea() {
+class JSONView(private val json: JSONObject) : JTextArea() {
     init {
         refresh()
         json.addObserver(object: JSONObserver {
@@ -9,6 +9,9 @@ class JSONView(private val json: JSONNode) : JTextArea() {
             override fun elementReplaced() { refresh() }
             override fun deletedAllElements() { refresh() }
         })
+
+        isEditable = false
+        tabSize = 2
     }
 
     private fun refresh() {
