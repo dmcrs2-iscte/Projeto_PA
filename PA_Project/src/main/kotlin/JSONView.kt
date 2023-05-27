@@ -7,6 +7,7 @@ class JSONView(private val json: JSONNode) : JTextArea() {
             override fun elementAdded() { refresh() }
             override fun elementRemoved() { refresh() }
             override fun elementReplaced() { refresh() }
+            override fun deletedAllElements() { refresh() }
         })
     }
 

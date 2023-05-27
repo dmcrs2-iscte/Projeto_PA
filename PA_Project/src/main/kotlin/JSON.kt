@@ -137,6 +137,11 @@ data class JSONObject(override val value: MutableList<JSONProperty> = mutableLis
         }
     }
 
+    fun removeAllElements() {
+        value.clear()
+        observers.forEach { it.deletedAllElements() }
+    }
+
     override fun accept(v: JSONVisitor) {
         if (v.visit(this)) value.forEach { it.accept(v) }
     }
@@ -172,4 +177,5 @@ interface JSONObserver {
     fun elementAdded()
     fun elementRemoved()
     fun elementReplaced()
+    fun deletedAllElements()
 }
