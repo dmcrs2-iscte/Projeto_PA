@@ -79,15 +79,16 @@ class EditorView() : JPanel() {
             val property = JSONProperty(key, JSONEmpty())
             observers.forEach { it.elementAdded(property) }
 
-            add(getTextField(key))
+            add(getTextField(property))
         }
 
-    private fun getTextField(key: String): JTextField =
+    private fun getTextField(property: JSONProperty): JTextField =
         JTextField().apply {
             addKeyListener(object : KeyAdapter() {
                 override fun keyPressed(e: KeyEvent) {
                     if (e.keyCode == KeyEvent.VK_ENTER) {
-                        json.replaceElement(key, jsonTypeAssigner(text))
+                        val newElement = jsonTypeAssigner(text)
+                        observers.forEach { it.elementReplaced(property, newElement) }
                     }
                 }
             })
