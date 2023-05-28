@@ -6,7 +6,7 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.*
 
-class EditorView(private val json: JSONObject) : JPanel() {
+class EditorView() : JPanel() {
     private val observers: MutableList<EditorViewObserver> = mutableListOf()
 
     init {
@@ -44,7 +44,7 @@ class EditorView(private val json: JSONObject) : JPanel() {
                         val del = JButton("Delete All")
                         del.addActionListener {
                             components.forEach { remove(it) }
-                            json.removeAllElements()
+                            observers.forEach { it.allElementsRemoved() }
                             menu.isVisible = false
                             revalidate()
                             repaint()
@@ -77,7 +77,7 @@ class EditorView(private val json: JSONObject) : JPanel() {
             add(JLabel(key))
 
             val property = JSONProperty(key, JSONEmpty())
-            json.addElement(property)
+            observers.forEach { it.elementAdded(property) }
 
             add(getTextField(key))
         }
@@ -95,5 +95,8 @@ class EditorView(private val json: JSONObject) : JPanel() {
 }
 
 interface EditorViewObserver {
-
+    fun elementAdded(property: JSONProperty)
+    fun elementRemoved(property: JSONProperty)
+    fun elementReplaced(property: JSONProperty, newElement: JSONElement)
+    fun allElementsRemoved()
 }
