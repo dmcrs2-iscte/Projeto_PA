@@ -7,6 +7,8 @@ import java.awt.event.MouseEvent
 import javax.swing.*
 
 class EditorView(private val json: JSONObject) : JPanel() {
+    private val observers: MutableList<EditorViewObserver> = mutableListOf()
+
     init {
         layout = GridLayout()
 
@@ -15,6 +17,8 @@ class EditorView(private val json: JSONObject) : JPanel() {
             verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
         })
     }
+
+    fun addObserver(observer: EditorViewObserver) = observers.add(observer)
 
     private fun getPanel(): JPanel =
         JPanel().apply {

@@ -9,8 +9,11 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
         layout = GridLayout(0, 2)
         size = Dimension(600, 600)
 
-        add(EditorView(jsonObject))
-        add(JSONView(jsonObject))
+        val editorView = EditorView(jsonObject)
+        add(editorView)
+
+        val jsonView = JSONView(jsonObject)
+        add(jsonView)
     }
 
     fun open() {
