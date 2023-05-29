@@ -34,16 +34,25 @@ class EditorView : JPanel() {
                         val add = JButton("Add")
                         add.addActionListener {
                             val text = JOptionPane.showInputDialog(panel, "text")
-                            if(text != null) if(text.isEmpty()) JOptionPane.showMessageDialog(panel,"Nome da propriedade não pode ser vazio!","Josue", JOptionPane.ERROR_MESSAGE) else add(getWidget(text))
+                            if (text != null) {
+                                if (text.isEmpty())
+                                    JOptionPane.showMessageDialog(
+                                        panel,
+                                        "Nome da propriedade não pode ser vazio!",
+                                        "Josue",
+                                        JOptionPane.ERROR_MESSAGE
+                                    )
+                                else add(getWidget(text))
+                            }
                             menu.isVisible = false
                             revalidate()
                             repaint()
                         }
                         menu.add(add)
 
-                        if(panel.parent is JPanel){
+                        if (panel.parent is JPanel) {
                             val remove = JButton("Remove")
-                            remove.addActionListener{
+                            remove.addActionListener {
 
                             }
                         }
@@ -87,7 +96,7 @@ class EditorView : JPanel() {
                 override fun keyPressed(e: KeyEvent) {
                     if (e.keyCode == KeyEvent.VK_ENTER) {
                         val newElement = jsonTypeAssigner(text)
-                        if(newElement.value != oldProperty.element.value) {
+                        if (newElement.value != oldProperty.element.value) {
                             observers.forEach { it.elementReplaced(oldProperty, newElement, textField) }
                             oldProperty = JSONProperty(oldProperty.name, newElement)
                         }
@@ -95,6 +104,16 @@ class EditorView : JPanel() {
                 }
             })
         }
+
+    internal fun removeAllComponents() {
+        removeAll()
+        add(JScrollPane(getPanel()).apply {
+            horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
+            verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
+        })
+        revalidate()
+        repaint()
+    }
 }
 
 interface EditorViewObserver {

@@ -18,10 +18,14 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
 
         val editorView = EditorView()
         add(JPanel().apply {
-            layout = GridLayout(0,2)
+            layout = GridLayout(0, 2)
             editorView.addObserver(object : EditorViewObserver {
-                override fun elementAdded(property: JSONProperty, component: JComponent) = runCommand(AddElement(jsonObject, property, component))
-                override fun elementRemoved(property: JSONProperty, component: JComponent) = runCommand(RemoveElement(jsonObject, property, component))
+                override fun elementAdded(property: JSONProperty, component: JComponent) =
+                    runCommand(AddElement(jsonObject, property, component))
+
+                override fun elementRemoved(property: JSONProperty, component: JComponent) =
+                    runCommand(RemoveElement(jsonObject, property, component))
+
                 override fun elementReplaced(property: JSONProperty, newElement: JSONElement, component: JComponent) =
                     runCommand(ReplaceElement(jsonObject, property, newElement, component))
             })
@@ -32,19 +36,23 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
         }, BorderLayout.CENTER)
 
         add(JPanel().apply {
-            layout = GridLayout(0,2)
+            layout = GridLayout(0, 2)
             add(JButton("Undo").apply {
                 addActionListener {
-                    if(!commands.isEmpty()) {
+                    if (!commands.isEmpty()) {
                         commands.pop().undo()
                         revalidate()
                         repaint()
                     }
-                    //println(commands)
                 }
             })
             add(JButton("Delete All").apply {
-
+                addActionListener {
+                    runCommand(RemoveAllElements(jsonObject, editorView))
+                    editorView.removeAllComponents()
+                    revalidate()
+                    repaint()
+                }
             })
         }, BorderLayout.PAGE_END)
     }
