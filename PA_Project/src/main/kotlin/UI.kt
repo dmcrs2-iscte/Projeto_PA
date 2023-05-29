@@ -11,28 +11,30 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
         command.run()
     }
 
+    private val panel = JPanel()
     private val frame = JFrame("Josue - JSON Object Editor").apply {
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         layout = BorderLayout()
         size = Dimension(600, 600)
 
+
         val editorView = EditorView()
-        add(JPanel().apply {
+        editorView.addObserver(object : EditorViewObserver {
+            override fun elementAdded(property: JSONProperty, component: JComponent) =
+                runCommand(AddElement(jsonObject, property, component))
+
+            override fun elementRemoved(property: JSONProperty, component: JComponent) =
+                runCommand(RemoveElement(jsonObject, property, component))
+
+            override fun elementReplaced(property: JSONProperty, newElement: JSONElement, component: JComponent) =
+                runCommand(ReplaceElement(jsonObject, property, newElement, component))
+        })
+
+        add(panel.apply {
             layout = GridLayout(0, 2)
-            editorView.addObserver(object : EditorViewObserver {
-                override fun elementAdded(property: JSONProperty, component: JComponent) =
-                    runCommand(AddElement(jsonObject, property, component))
 
-                override fun elementRemoved(property: JSONProperty, component: JComponent) =
-                    runCommand(RemoveElement(jsonObject, property, component))
-
-                override fun elementReplaced(property: JSONProperty, newElement: JSONElement, component: JComponent) =
-                    runCommand(ReplaceElement(jsonObject, property, newElement, component))
-            })
-            add(editorView)
-
-            val jsonView = JSONView(jsonObject)
-            add(jsonView)
+            add(JScrollPane(editorView))
+            add(JSONView(jsonObject))
         }, BorderLayout.CENTER)
 
         add(JPanel().apply {
@@ -48,8 +50,7 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
             })
             add(JButton("Delete All").apply {
                 addActionListener {
-                    runCommand(RemoveAllElements(jsonObject, editorView))
-                    editorView.removeAllComponents()
+                runCommand(RemoveAllElements(jsonObject, editorView))
                     revalidate()
                     repaint()
                 }

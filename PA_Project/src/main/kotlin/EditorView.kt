@@ -11,11 +11,7 @@ class EditorView : JPanel() {
 
     init {
         layout = GridLayout()
-
-        add(JScrollPane(getPanel()).apply {
-            horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
-            verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
-        })
+        add(getPanel())
     }
 
     fun addObserver(observer: EditorViewObserver) = observers.add(observer)
@@ -50,12 +46,11 @@ class EditorView : JPanel() {
                         }
                         menu.add(add)
 
-                        if (panel.parent is JPanel) {
-                            val remove = JButton("Remove")
-                            remove.addActionListener {
+                        /*val remove = JButton("Remove")
+                        remove.addActionListener {
 
-                            }
                         }
+                        menu.add(remove)*/
 
                         menu.show(this@apply, e.x, e.y)
                     }
@@ -105,15 +100,6 @@ class EditorView : JPanel() {
             })
         }
 
-    internal fun removeAllComponents() {
-        removeAll()
-        add(JScrollPane(getPanel()).apply {
-            horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS
-            verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_ALWAYS
-        })
-        revalidate()
-        repaint()
-    }
 }
 
 interface EditorViewObserver {

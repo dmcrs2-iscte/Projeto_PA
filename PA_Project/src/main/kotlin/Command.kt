@@ -1,5 +1,7 @@
+import java.awt.Component
 import java.awt.Container
 import javax.swing.JComponent
+import javax.swing.JPanel
 import javax.swing.JTextField
 
 
@@ -44,13 +46,23 @@ class ReplaceElement(private val jsonObject: JSONObject, private val property: J
 }
 
 class RemoveAllElements(private val jsonObject: JSONObject, private val component: JComponent): Command {
-    private var backup = mutableListOf<JSONProperty>()
-    init {
-        backup = jsonObject.value.toMutableList()
+    private val jsonBackup: List<JSONProperty> = jsonObject.value.toList()
+    private val panel: JPanel = component.components[0] as JPanel
+    private val componentsBackup: List<Component> = panel.components.toList()
+
+    override fun run() {
+        jsonBackup.forEach { jsonObject.removeElement(it) }
+
+        panel.removeAll()
+        component.revalidate()
+        component.repaint()
     }
 
-    override fun run() = backup.forEach { jsonObject.removeElement(it) }
     override fun undo() {
-        backup.forEach { jsonObject.addElement(it) }
+        jsonBackup.forEach { jsonObject.addElement(it) }
+
+        componentsBackup.forEach { panel.add(it) }
+        component.revalidate()
+        component.repaint()
     }
 }
