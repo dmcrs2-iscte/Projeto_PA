@@ -30,7 +30,7 @@ class RemoveElement(private val jsonObject: JSONObject, private val property: JS
     override fun run() = jsonObject.removeElement(property)
     override fun undo() {
         jsonObject.addElement(property)
-        parent.add(component)
+        parent.add(component, index)
     }
 }
 
