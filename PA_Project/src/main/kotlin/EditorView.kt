@@ -6,7 +6,7 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.*
 
-class EditorView() : JPanel() {
+class EditorView : JPanel() {
     private val observers: MutableList<EditorViewObserver> = mutableListOf()
 
     init {
@@ -25,33 +25,30 @@ class EditorView() : JPanel() {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
             alignmentY = Component.TOP_ALIGNMENT
+            val panel = this
 
             addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent) {
                     if (SwingUtilities.isRightMouseButton(e)) {
                         val menu = JPopupMenu("Message")
-
                         val add = JButton("Add")
                         add.addActionListener {
-                            val text = JOptionPane.showInputDialog("text")
-                            add(getWidget(text))
+                            val text = JOptionPane.showInputDialog(panel, "text")
+                            if(text != null) if(text.isEmpty()) JOptionPane.showMessageDialog(panel,"Nome da propriedade não pode ser vazio!","Josue", JOptionPane.ERROR_MESSAGE) else add(getWidget(text))
                             menu.isVisible = false
                             revalidate()
                             repaint()
                         }
                         menu.add(add)
 
-                        val del = JButton("Delete All")
-                        del.addActionListener {
-                            components.forEach { remove(it) }
-                            observers.forEach { it.allElementsRemoved() }
-                            menu.isVisible = false
-                            revalidate()
-                            repaint()
-                        }
-                        menu.add(del)
+                        if(panel.parent is JPanel){
+                            val remove = JButton("Remove")
+                            remove.addActionListener{
 
-                        menu.show(this@apply, 100, 100)
+                            }
+                        }
+
+                        menu.show(this@apply, e.x, e.y)
                     }
                 }
             })
@@ -77,18 +74,23 @@ class EditorView() : JPanel() {
             add(JLabel(key))
 
             val property = JSONProperty(key, JSONEmpty())
-            observers.forEach { it.elementAdded(property) }
+            observers.forEach { it.elementAdded(property, this) }
 
             add(getTextField(property))
         }
 
     private fun getTextField(property: JSONProperty): JTextField =
         JTextField().apply {
+            val textField = this
+            var oldProperty = property
             addKeyListener(object : KeyAdapter() {
                 override fun keyPressed(e: KeyEvent) {
                     if (e.keyCode == KeyEvent.VK_ENTER) {
                         val newElement = jsonTypeAssigner(text)
-                        observers.forEach { it.elementReplaced(property, newElement) }
+                        if(newElement.value != oldProperty.element.value) {
+                            observers.forEach { it.elementReplaced(oldProperty, newElement, textField) }
+                            oldProperty = JSONProperty(oldProperty.name, newElement)
+                        }
                     }
                 }
             })
@@ -96,8 +98,7 @@ class EditorView() : JPanel() {
 }
 
 interface EditorViewObserver {
-    fun elementAdded(property: JSONProperty)
-    fun elementRemoved(property: JSONProperty)
-    fun elementReplaced(property: JSONProperty, newElement: JSONElement)
-    fun allElementsRemoved()
+    fun elementAdded(property: JSONProperty, component: JComponent)
+    fun elementRemoved(property: JSONProperty, component: JComponent)
+    fun elementReplaced(property: JSONProperty, newElement: JSONElement, component: JComponent)
 }

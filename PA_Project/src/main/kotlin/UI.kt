@@ -1,7 +1,6 @@
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.GridLayout
-import java.awt.event.MouseListener
 import java.util.*
 import javax.swing.*
 
@@ -21,10 +20,10 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
         add(JPanel().apply {
             layout = GridLayout(0,2)
             editorView.addObserver(object : EditorViewObserver {
-                override fun elementAdded(property: JSONProperty) = runCommand(AddElement(jsonObject, property))
-                override fun elementRemoved(property: JSONProperty) = runCommand(RemoveElement(jsonObject, property))
-                override fun elementReplaced(property: JSONProperty, newElement: JSONElement) =
-                    runCommand(ReplaceElement(jsonObject, property, newElement))
+                override fun elementAdded(property: JSONProperty, component: JComponent) = runCommand(AddElement(jsonObject, property, component))
+                override fun elementRemoved(property: JSONProperty, component: JComponent) = runCommand(RemoveElement(jsonObject, property, component))
+                override fun elementReplaced(property: JSONProperty, newElement: JSONElement, component: JComponent) =
+                    runCommand(ReplaceElement(jsonObject, property, newElement, component))
             })
             add(editorView)
 
@@ -41,7 +40,7 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
                         revalidate()
                         repaint()
                     }
-                    println(commands)
+                    //println(commands)
                 }
             })
             add(JButton("Delete All").apply {
