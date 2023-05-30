@@ -10,18 +10,24 @@ interface Command {
     fun undo()
 }
 
-class AddElement(private val jsonObject: JSONObject, private val property: JSONProperty, private val component: JComponent): Command {
-    override fun run() = jsonObject.addElement(property)
+class AddElement(private val jsonNode: JSONNode, private val property: JSONProperty, private val component: JComponent): Command {
+    override fun run(){
+        if( jsonNode is JSONObject ) {
+            jsonNode.addElement(property)
+        }
+    }
     override fun undo() {
-        jsonObject.removeElement(property)
-        val parent = component.parent
-        parent.remove(component)
-        parent.revalidate()
-        parent.repaint()
+        if( jsonNode is JSONObject ) {
+            jsonNode.removeElement(property)
+            val parent = component.parent
+            parent.remove(component)
+            parent.revalidate()
+            parent.repaint()
+        }
     }
 }
 
-class RemoveElement(private val jsonObject: JSONObject, private val property: JSONProperty, private val component: JComponent): Command {
+class RemoveElement(private val jsonNode: JSONNode, private val property: JSONProperty, private val component: JComponent): Command {
     private var parent = Container()
     private var index = -1
 
@@ -31,23 +37,33 @@ class RemoveElement(private val jsonObject: JSONObject, private val property: JS
     }
 
     override fun run() {
-        jsonObject.removeElement(property)
-        val parent = component.parent
-        parent.remove(component)
-        parent.revalidate()
-        parent.repaint()
+        if( jsonNode is JSONObject ) {
+            jsonNode.removeElement(property)
+            val parent = component.parent
+            parent.remove(component)
+            parent.revalidate()
+            parent.repaint()
+        }
     }
     override fun undo() {
-        jsonObject.addElement(property)
-        parent.add(component, index)
+        if( jsonNode is JSONObject ) {
+            jsonNode.addElement(property)
+            parent.add(component, index)
+        }
     }
 }
 
-class ReplaceElement(private val jsonObject: JSONObject, private val property: JSONProperty, private val newElement: JSONElement, private val component: JComponent): Command {
-    override fun run() = jsonObject.replaceElement(property.name, newElement)
+class ReplaceElement(private val jsonNode: JSONNode, private val property: JSONProperty, private val newElement: JSONElement, private val component: JComponent): Command {
+    override fun run() {
+        if( jsonNode is JSONObject ){
+            jsonNode.replaceElement(property.name, newElement)
+        }
+    }
     override fun undo() {
-        jsonObject.replaceElement(property.name, property.element)
-        (component as JTextField).text = property.element.toString()
+        if( jsonNode is JSONObject ) {
+            jsonNode.replaceElement(property.name, property.element)
+            (component as JTextField).text = property.element.toString()
+        }
     }
 }
 

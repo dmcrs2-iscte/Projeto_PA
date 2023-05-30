@@ -1,17 +1,22 @@
-import java.awt.Component
-import java.awt.GridLayout
+import java.awt.*
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.util.*
 import javax.swing.*
 
-class EditorView : JPanel() {
+class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Command>) : JPanel() {
     private val observers: MutableList<EditorViewObserver> = mutableListOf()
 
     init {
         layout = GridLayout()
         add(getPanel())
+    }
+
+    fun runCommand(command: Command) {
+        commands.push(command)
+        command.run()
     }
 
     fun addObserver(observer: EditorViewObserver) = observers.add(observer)
@@ -21,6 +26,7 @@ class EditorView : JPanel() {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
             alignmentY = Component.TOP_ALIGNMENT
+            border = BorderFactory.createLineBorder(Color.black)
             val panel = this
 
             addMouseListener(object : MouseAdapter() {
@@ -74,10 +80,11 @@ class EditorView : JPanel() {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
             alignmentY = Component.TOP_ALIGNMENT
+            border = BorderFactory.createLineBorder(Color.black)
 
             add(JLabel(key))
             val property = JSONProperty(key, JSONEmpty())
-            observers.forEach { it.elementAdded(property, this) }
+            observers.forEach { it.elementAdded(jsonNode, property, this) }
 
             val textField = getTextField(property)
             add(textField)
@@ -96,6 +103,7 @@ class EditorView : JPanel() {
                         }
                         menu.add(remove)
                         menu.add(addAddButton(panel.parent as JPanel, menu))
+                        menu.add(addObjectButton(panel.parent as JPanel, menu))
                         menu.show(this@apply, e.x, e.y)
                     }
                 }
@@ -112,7 +120,7 @@ class EditorView : JPanel() {
                     if (e.keyCode == KeyEvent.VK_ENTER) {
                         val newElement = jsonTypeAssigner(text)
                         if (newElement.value != oldProperty.element.value) {
-                            observers.forEach { it.elementReplaced(oldProperty, newElement, textField) }
+                            observers.forEach { it.elementReplaced(jsonNode, oldProperty, newElement, textField) }
                             oldProperty = JSONProperty(oldProperty.name, newElement)
                         }
                     }
@@ -159,14 +167,31 @@ class EditorView : JPanel() {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
             alignmentY = Component.TOP_ALIGNMENT
+            border = BorderFactory.createLineBorder(Color.black)
 
-            add(JLabel(key))
+            val label = JPanel().apply {
+                layout = FlowLayout(FlowLayout.LEFT)
+                add(JLabel(key))
+            }
+            add(label)
 
-            val property = JSONProperty(key, JSONObject())
-            observers.forEach { it.elementAdded(property, this) }
+            val jsonObject = JSONObject()
+            val property = JSONProperty(key, jsonObject)
+            observers.forEach { it.elementAdded(jsonNode, property, this) }
 
-            val objectPanel = getPanel()
-            add(objectPanel)
+            val objectPanel = EditorView(jsonObject, commands)
+
+            objectPanel.addObserver(object : EditorViewObserver {
+                override fun elementAdded(jsonNode: JSONNode, property: JSONProperty, component: JComponent) =
+                    runCommand(AddElement(jsonNode, property, component))
+
+                override fun elementRemoved(jsonNode: JSONNode, property: JSONProperty, component: JComponent) =
+                    runCommand(RemoveElement(jsonNode, property, component))
+
+                override fun elementReplaced(jsonNode: JSONNode, property: JSONProperty, newElement: JSONElement, component: JComponent) =
+                    runCommand(ReplaceElement(jsonNode, property, newElement, component))
+            })
+            label.add(objectPanel)
 
             val panel = this
 
@@ -177,6 +202,8 @@ class EditorView : JPanel() {
 
                         menu.add(addAddButton(panel.parent as JPanel, menu))
 
+                        menu.add(addObjectButton(panel.parent as JPanel, menu))
+
                         menu.show(this@apply, e.x, e.y)
                     }
                 }
@@ -185,7 +212,7 @@ class EditorView : JPanel() {
 
     private fun removeWidget(property: JSONProperty, textField: JTextField, panel: JPanel) {
         val text = if (textField.text != "null") textField.text else ""
-        observers.forEach { it.elementRemoved(JSONProperty(property.name, jsonTypeAssigner(text)), panel) }
+        observers.forEach { it.elementRemoved(jsonNode, JSONProperty(property.name, jsonTypeAssigner(text)), panel) }
     }
 
     private fun jsonTypeAssigner(value: String): JSONElement {

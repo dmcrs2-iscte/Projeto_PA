@@ -18,16 +18,16 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
         size = Dimension(600, 600)
 
 
-        val editorView = EditorView()
+        val editorView = EditorView(jsonObject, commands)
         editorView.addObserver(object : EditorViewObserver {
-            override fun elementAdded(property: JSONProperty, component: JComponent) =
-                runCommand(AddElement(jsonObject, property, component))
+            override fun elementAdded(jsonNode: JSONNode, property: JSONProperty, component: JComponent) =
+                runCommand(AddElement(jsonNode, property, component))
 
-            override fun elementRemoved(property: JSONProperty, component: JComponent) =
-                runCommand(RemoveElement(jsonObject, property, component))
+            override fun elementRemoved(jsonNode: JSONNode, property: JSONProperty, component: JComponent) =
+                runCommand(RemoveElement(jsonNode, property, component))
 
-            override fun elementReplaced(property: JSONProperty, newElement: JSONElement, component: JComponent) =
-                runCommand(ReplaceElement(jsonObject, property, newElement, component))
+            override fun elementReplaced(jsonNode: JSONNode, property: JSONProperty, newElement: JSONElement, component: JComponent) =
+                runCommand(ReplaceElement(jsonNode, property, newElement, component))
         })
 
         add(panel.apply {
