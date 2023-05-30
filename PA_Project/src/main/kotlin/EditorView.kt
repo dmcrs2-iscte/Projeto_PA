@@ -3,7 +3,6 @@ import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.util.*
 import javax.swing.*
 
 class EditorView(private val jsonNode: JSONNode, private val observer: EditorViewObserver) : JPanel() {
@@ -125,11 +124,7 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
             })
         }
 
-    private fun getLabel() {
-
-    }
-
-    private fun getObjectWidget(key: String): JPanel =
+    private fun getCompositeWidget(key: String, node: JSONNode): JPanel =
         JPanel().apply {
             formatWidget(this)
 
@@ -139,10 +134,9 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
             }
             add(label)
 
-            val jsonObject = JSONObject()
-            observers.forEach { it.elementAdded(jsonNode, key, jsonObject, this) }
+            observers.forEach { it.elementAdded(jsonNode, key, node, this) }
 
-            val objectPanel = EditorView(jsonObject, observer)
+            val objectPanel = EditorView(node, observer)
             objectPanel.addObserver(observer)
             label.add(objectPanel)
 
@@ -164,41 +158,11 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
             })
         }
 
+    private fun getObjectWidget(key: String): JPanel =
+        getCompositeWidget(key, JSONObject())
+
     private fun getArrayWidget(key: String): JPanel =
-        JPanel().apply {
-            formatWidget(this)
-
-            val label = JPanel().apply {
-                layout = FlowLayout(FlowLayout.LEFT)
-                if (key.isNotEmpty()) add(JLabel(key)) else add(JLabel("   "))
-            }
-            add(label)
-
-            val jsonArray = JSONArray()
-
-            observers.forEach { it.elementAdded(jsonNode, key, jsonArray, this) }
-
-            val arrayPanel = EditorView(jsonArray, observer)
-            arrayPanel.addObserver(observer)
-            label.add(arrayPanel)
-
-            val panel = this
-            addMouseListener(object : MouseAdapter() {
-                override fun mouseClicked(e: MouseEvent) {
-                    if (SwingUtilities.isRightMouseButton(e)) {
-                        val menu = JPopupMenu("Message")
-
-                        menu.isLightWeightPopupEnabled = false
-
-                        menu.add(getAddButton(panel.parent as JPanel, menu))
-                        menu.add(getObjectButton(panel.parent as JPanel, menu))
-                        menu.add(getArrayButton(panel.parent as JPanel, menu))
-
-                        menu.show(this@apply, e.x, e.y)
-                    }
-                }
-            })
-        }
+        getCompositeWidget(key, JSONArray())
 
     private fun removeWidget(key: String, textField: JTextField, panel: JPanel) {
         val text = if (textField.text != "null") textField.text else ""
