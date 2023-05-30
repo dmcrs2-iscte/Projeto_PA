@@ -11,24 +11,25 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
         command.run()
     }
 
+    private val editorViewObserver: EditorViewObserver = object : EditorViewObserver {
+        override fun elementAdded(jsonNode: JSONNode, key: String, element: JSONElement, component: JComponent) =
+            runCommand(AddElement(jsonNode, key, element, component))
+
+        override fun elementRemoved(jsonNode: JSONNode, key: String, element: JSONElement, component: JComponent) =
+            runCommand(RemoveElement(jsonNode, key, element, component))
+
+        override fun elementReplaced(jsonNode: JSONNode, key: String, element: JSONElement, newElement: JSONElement, component: JComponent) =
+            runCommand(ReplaceElement(jsonNode, key, element, newElement, component))
+    }
+
     private val panel = JPanel()
     private val frame = JFrame("Josue - JSON Object Editor").apply {
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         layout = BorderLayout()
         size = Dimension(600, 600)
 
-
-        val editorView = EditorView(jsonObject, commands)
-        editorView.addObserver(object : EditorViewObserver {
-            override fun elementAdded(jsonNode: JSONNode, key: String, element: JSONElement, component: JComponent) =
-                runCommand(AddElement(jsonNode, key, element, component))
-
-            override fun elementRemoved(jsonNode: JSONNode, key: String, element: JSONElement, component: JComponent) =
-                runCommand(RemoveElement(jsonNode, key, element, component))
-
-            override fun elementReplaced(jsonNode: JSONNode, key: String, element: JSONElement, newElement: JSONElement, component: JComponent) =
-                runCommand(ReplaceElement(jsonNode, key, element, newElement, component))
-        })
+        val editorView = EditorView(jsonObject, editorViewObserver)
+        editorView.addObserver(editorViewObserver)
 
         add(panel.apply {
             layout = GridLayout(0, 2)
