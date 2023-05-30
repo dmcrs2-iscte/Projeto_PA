@@ -16,12 +16,13 @@ class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Com
         })
     }
 
-    fun runCommand(command: Command) {
+    fun addObserver(observer: EditorViewObserver) = observers.add(observer)
+
+    private fun runCommand(command: Command) {
         commands.push(command)
         command.run()
     }
 
-    fun addObserver(observer: EditorViewObserver) = observers.add(observer)
 
     private fun getPanel(): JPanel =
         JPanel().apply {
@@ -35,63 +36,72 @@ class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Com
                 override fun mouseClicked(e: MouseEvent) {
                     if (SwingUtilities.isRightMouseButton(e)) {
                         val menu = JPopupMenu("Message")
-
                         menu.isLightWeightPopupEnabled = false
 
-                        menu.add(addAddButton(panel, menu))
-                        menu.add(addObjectButton(panel, menu))
-                        menu.add(addArrayButton(panel, menu))
-
+                        menu.add(getAddButton(panel, menu))
+                        menu.add(getObjectButton(panel, menu))
+                        menu.add(getArrayButton(panel, menu))
                         menu.show(this@apply, e.x, e.y)
                     }
                 }
             })
         }
 
-    private fun addAddButton(panel: JPanel, menu: JPopupMenu): JButton {
-        val add = JButton("Add")
-        add.addActionListener {
-            if( jsonNode is JSONObject) {
+
+    private fun getButton(panel: JPanel, menu: JPopupMenu, buttonText: String, widgetFunction: (String) -> Component): JButton {
+        val button = JButton(buttonText)
+        button.addActionListener {
+            if (jsonNode is JSONObject) {
                 val text = JOptionPane.showInputDialog(panel, "text")
                 if (text != null) {
-                    if (text.isEmpty()) {
+                    if (text.isEmpty())
                         JOptionPane.showMessageDialog(
-                            panel,
-                            "Nome da propriedade não pode ser vazio!",
-                            "Josue",
-                            JOptionPane.ERROR_MESSAGE
+                            panel, "Nome da propriedade não pode ser vazio!",
+                            "Josue", JOptionPane.ERROR_MESSAGE
                         )
-                    } else {
+                    else {
                         try {
-                            panel.add(getWidget(text))
+                            panel.add(widgetFunction(text))
                         } catch (e: IllegalArgumentException) {
                             JOptionPane.showMessageDialog(
-                                panel,
-                                "Nome da propriedade não pode ser igual a outro dentro do mesmo objeto!",
-                                "Josue",
-                                JOptionPane.ERROR_MESSAGE
+                                panel, "Nome da propriedade não pode ser igual a outro dentro do mesmo objeto!",
+                                "Josue", JOptionPane.ERROR_MESSAGE
                             )
                         }
                     }
                 }
-            }else{
-                panel.add(getWidget(""))
-            }
+            } else panel.add(widgetFunction(""))
             menu.isVisible = false
-            revalidate()
-            repaint()
+            panel.revalidate()
+            panel.repaint()
         }
-        return add
+        return button
     }
 
-    private fun getWidget(key: String): JPanel =
-        JPanel().apply {
+    private fun getAddButton(panel: JPanel, menu: JPopupMenu) =
+        getButton(panel, menu, "Add") { text -> getWidget(text) }
+
+    private fun getObjectButton(panel: JPanel, menu: JPopupMenu) =
+        getButton(panel, menu, "Add Object") { text -> getObjectWidget(text) }
+
+    private fun getArrayButton(panel: JPanel, menu: JPopupMenu) =
+        getButton(panel, menu, "Add Array") { text -> getArrayWidget(text) }
+
+
+    private fun formatWidget(panel: JPanel) {
+        panel.apply {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
             alignmentY = Component.TOP_ALIGNMENT
             border = BorderFactory.createLineBorder(Color.black)
+        }
+    }
 
-            if(key.isNotEmpty()) add(JLabel(key)) else add(JLabel("   "))
+    private fun getWidget(key: String): JPanel =
+        JPanel().apply {
+            formatWidget(this)
+
+            if (key.isNotEmpty()) add(JLabel(key)) else add(JLabel("   "))
             val element = JSONEmpty()
             observers.forEach { it.elementAdded(jsonNode, key, element, this) }
 
@@ -113,84 +123,38 @@ class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Com
                             revalidate()
                             repaint()
                         }
+                        menu.add(getAddButton(panel.parent as JPanel, menu))
+                        menu.add(getObjectButton(panel.parent as JPanel, menu))
+                        menu.add(getArrayButton(panel.parent as JPanel, menu))
                         menu.add(remove)
-                        menu.add(addAddButton(panel.parent as JPanel, menu))
-                        menu.add(addObjectButton(panel.parent as JPanel, menu))
                         menu.show(this@apply, e.x, e.y)
                     }
                 }
             })
         }
 
-    private fun getTextField(key: String, element: JSONElement): JTextField {
-        var oldElement = element
-        val textField = JTextField().apply {
-            val textField = this
-            addKeyListener(object : KeyAdapter() {
-                override fun keyPressed(e: KeyEvent) {
-                    if (e.keyCode == KeyEvent.VK_ENTER) {
-                        val newElement = jsonTypeAssigner(text)
-                        if (newElement.value != oldElement.value) {
-                            observers.forEach { it.elementReplaced(jsonNode, key, oldElement, newElement, textField) }
-                            oldElement = newElement
-                        }
-                    }
-                }
-            })
-        }
-        return textField
-    }
-
-    private fun addObjectButton(panel: JPanel, menu: JPopupMenu): JButton {
-        val addObject = JButton("Add Object")
-        addObject.addActionListener {
-            if ( jsonNode is JSONObject ) {
-                val text = JOptionPane.showInputDialog(panel, "text")
-                if (text != null) {
-                    if (text.isEmpty()) {
-                        JOptionPane.showMessageDialog(
-                            panel,
-                            "Nome da propriedade não pode ser vazio!",
-                            "Josue",
-                            JOptionPane.ERROR_MESSAGE
-                        )
-                    } else {
-                        try {
-                            panel.add(getObjectWidget(text))
-                        } catch (e: IllegalArgumentException) {
-                            JOptionPane.showMessageDialog(
-                                panel,
-                                "Nome da propriedade não pode ser igual a outro dentro do mesmo objeto!",
-                                "Josue",
-                                JOptionPane.ERROR_MESSAGE
-                            )
-                        }
-                    }
-                }
-            } else {
-                panel.add(getObjectWidget(""))
+    private fun addLabelToWidget(panel: JPanel, key: String) {
+        panel.apply {
+            val label = JPanel().apply {
+                layout = FlowLayout(FlowLayout.LEFT)
+                if (key.isNotEmpty()) add(JLabel(key)) else add(JLabel("   "))
             }
-            menu.isVisible = false
-            panel.revalidate()
-            panel.repaint()
+            add(label)
         }
-        return addObject
     }
 
     private fun getObjectWidget(key: String): JPanel =
         JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.X_AXIS)
-            alignmentX = Component.LEFT_ALIGNMENT
-            alignmentY = Component.TOP_ALIGNMENT
-            border = BorderFactory.createLineBorder(Color.black)
+            formatWidget(this)
+
+            val jsonObject = JSONObject()
 
             val label = JPanel().apply {
                 layout = FlowLayout(FlowLayout.LEFT)
-                if(key.isNotEmpty()) add(JLabel(key)) else add(JLabel("   "))
+                if (key.isNotEmpty()) add(JLabel(key)) else add(JLabel("   "))
             }
             add(label)
 
-            val jsonObject = JSONObject()
             observers.forEach { it.elementAdded(jsonNode, key, jsonObject, this) }
 
             val objectPanel = EditorView(jsonObject, commands)
@@ -214,9 +178,9 @@ class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Com
 
                         menu.isLightWeightPopupEnabled = false
 
-                        menu.add(addAddButton(panel.parent as JPanel, menu))
-                        menu.add(addObjectButton(panel.parent as JPanel, menu))
-                        menu.add(addArrayButton(panel.parent as JPanel, menu))
+                        menu.add(getAddButton(panel.parent as JPanel, menu))
+                        menu.add(getObjectButton(panel.parent as JPanel, menu))
+                        menu.add(getArrayButton(panel.parent as JPanel, menu))
 
                         menu.show(this@apply, e.x, e.y)
                     }
@@ -224,67 +188,45 @@ class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Com
             })
         }
 
-    private fun addArrayButton(panel: JPanel, menu: JPopupMenu): JButton {
-        val addArray = JButton("Add Array")
-        addArray.addActionListener {
-            if( jsonNode is JSONObject ) {
-                val text = JOptionPane.showInputDialog(panel, "text")
-                if (text != null) {
-                    if (text.isEmpty()) {
-                        JOptionPane.showMessageDialog(
-                            panel,
-                            "Nome da propriedade não pode ser vazio!",
-                            "Josue",
-                            JOptionPane.ERROR_MESSAGE
-                        )
-                    } else {
-                        try {
-                            panel.add(getArrayWidget(text))
-                        } catch (e: IllegalArgumentException) {
-                            JOptionPane.showMessageDialog(
-                                panel,
-                                "Nome da propriedade não pode ser igual a outro dentro do mesmo objeto!",
-                                "Josue",
-                                JOptionPane.ERROR_MESSAGE
-                            )
-                        }
-                    }
-                }
-            }else{
-                panel.add(getArrayWidget(""))
-            }
-            menu.isVisible = false
-            panel.revalidate()
-            panel.repaint()
-        }
-        return addArray
-    }
-
     private fun getArrayWidget(key: String): JPanel =
         JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.X_AXIS)
-            alignmentX = Component.LEFT_ALIGNMENT
-            alignmentY = Component.TOP_ALIGNMENT
-            border = BorderFactory.createLineBorder(Color.black)
+            formatWidget(this)
+
+            val jsonArray = JSONArray()
 
             val label = JPanel().apply {
                 layout = FlowLayout(FlowLayout.LEFT)
-                if(key.isNotEmpty()) add(JLabel(key)) else add(JLabel("   "))
+                if (key.isNotEmpty()) add(JLabel(key)) else add(JLabel("   "))
             }
             add(label)
 
-            val jsonArray = JSONArray()
             observers.forEach { it.elementAdded(jsonNode, key, jsonArray, this) }
 
             val arrayPanel = EditorView(jsonArray, commands)
             arrayPanel.addObserver(object : EditorViewObserver {
-                override fun elementAdded(jsonNode: JSONNode, key: String, element: JSONElement, component: JComponent) =
+                override fun elementAdded(
+                    jsonNode: JSONNode,
+                    key: String,
+                    element: JSONElement,
+                    component: JComponent
+                ) =
                     runCommand(AddElement(jsonNode, key, element, component))
 
-                override fun elementRemoved(jsonNode: JSONNode, key: String, element: JSONElement, component: JComponent) =
+                override fun elementRemoved(
+                    jsonNode: JSONNode,
+                    key: String,
+                    element: JSONElement,
+                    component: JComponent
+                ) =
                     runCommand(RemoveElement(jsonNode, key, element, component))
 
-                override fun elementReplaced(jsonNode: JSONNode, key: String, element: JSONElement, newElement: JSONElement, component: JComponent) =
+                override fun elementReplaced(
+                    jsonNode: JSONNode,
+                    key: String,
+                    element: JSONElement,
+                    newElement: JSONElement,
+                    component: JComponent
+                ) =
                     runCommand(ReplaceElement(jsonNode, key, element, newElement, component))
             })
             label.add(arrayPanel)
@@ -297,9 +239,9 @@ class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Com
 
                         menu.isLightWeightPopupEnabled = false
 
-                        menu.add(addAddButton(panel.parent as JPanel, menu))
-                        menu.add(addObjectButton(panel.parent as JPanel, menu))
-                        menu.add(addArrayButton(panel.parent as JPanel, menu))
+                        menu.add(getAddButton(panel.parent as JPanel, menu))
+                        menu.add(getObjectButton(panel.parent as JPanel, menu))
+                        menu.add(getArrayButton(panel.parent as JPanel, menu))
 
                         menu.show(this@apply, e.x, e.y)
                     }
@@ -310,6 +252,25 @@ class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Com
     private fun removeWidget(key: String, textField: JTextField, panel: JPanel) {
         val text = if (textField.text != "null") textField.text else ""
         observers.forEach { it.elementRemoved(jsonNode, key, jsonTypeAssigner(text), panel) }
+    }
+
+    private fun getTextField(key: String, element: JSONElement): JTextField {
+        var oldElement = element
+        val textField = JTextField().apply {
+            val textField = this
+            addKeyListener(object : KeyAdapter() {
+                override fun keyPressed(e: KeyEvent) {
+                    if (e.keyCode == KeyEvent.VK_ENTER) {
+                        val newElement = jsonTypeAssigner(text)
+                        if (newElement.value != oldElement.value) {
+                            observers.forEach { it.elementReplaced(jsonNode, key, oldElement, newElement, textField) }
+                            oldElement = newElement
+                        }
+                    }
+                }
+            })
+        }
+        return textField
     }
 
     private fun jsonTypeAssigner(value: String): JSONElement {
@@ -327,5 +288,11 @@ class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Com
 interface EditorViewObserver {
     fun elementAdded(jsonNode: JSONNode, key: String, element: JSONElement, component: JComponent)
     fun elementRemoved(jsonNode: JSONNode, key: String, element: JSONElement, component: JComponent)
-    fun elementReplaced(jsonNode: JSONNode, key: String, element: JSONElement, newElement: JSONElement, component: JComponent)
+    fun elementReplaced(
+        jsonNode: JSONNode,
+        key: String,
+        element: JSONElement,
+        newElement: JSONElement,
+        component: JComponent
+    )
 }

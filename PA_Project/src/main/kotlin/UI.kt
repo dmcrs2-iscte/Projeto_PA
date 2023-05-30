@@ -17,7 +17,6 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
         layout = BorderLayout()
         size = Dimension(600, 600)
 
-
         val editorView = EditorView(jsonObject, commands)
         editorView.addObserver(object : EditorViewObserver {
             override fun elementAdded(jsonNode: JSONNode, key: String, element: JSONElement, component: JComponent) =
