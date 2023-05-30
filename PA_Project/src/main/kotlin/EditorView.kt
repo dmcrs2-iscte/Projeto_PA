@@ -99,18 +99,14 @@ class EditorView : JPanel() {
                 override fun mouseClicked(e: MouseEvent) {
                     if (SwingUtilities.isRightMouseButton(e)) {
                         val menu = JPopupMenu("Message")
-
-                        val source = e.source
-                        if (source is JPanel && source.components.isNotEmpty()) {
-                            val remove = JButton("Remove")
-                            remove.addActionListener {
-                                removeWidget(property, textField, panel)
-                                menu.isVisible = false
-                                revalidate()
-                                repaint()
-                            }
-                            menu.add(remove)
+                        val remove = JButton("Remove")
+                        remove.addActionListener {
+                            removeWidget(property, textField, panel)
+                            menu.isVisible = false
+                            revalidate()
+                            repaint()
                         }
+                        menu.add(remove)
                         menu.add(addAddButton(panel.parent as JPanel, menu))
 
                         menu.show(this@apply, e.x, e.y)
