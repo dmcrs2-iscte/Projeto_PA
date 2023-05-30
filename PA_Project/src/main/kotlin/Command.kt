@@ -11,24 +11,24 @@ interface Command {
     fun undo()
 }
 
-class AddElement(private val jsonNode: JSONNode, private val property: JSONProperty, private val component: JComponent): Command {
-    override fun run(){
-        if( jsonNode is JSONObject ) {
-            jsonNode.addElement(property)
-        }
+internal class AddElement(private val jsonNode: JSONNode, private val key: String, private val element: JSONElement, private val component: JComponent): Command {
+    override fun run() {
+        if (jsonNode is JSONObject) jsonNode.addElement(JSONProperty(key, element))
+        else if (jsonNode is JSONArray) jsonNode.addElement(element)
     }
+
     override fun undo() {
-        if( jsonNode is JSONObject ) {
-            jsonNode.removeElement(property)
-            val parent = component.parent
-            parent.remove(component)
-            parent.revalidate()
-            parent.repaint()
-        }
+        if (jsonNode is JSONObject) jsonNode.removeElement(JSONProperty(key, element))
+        else if (jsonNode is JSONArray) jsonNode.addElement(element)
+
+        val parent = component.parent
+        parent.remove(component)
+        parent.revalidate()
+        parent.repaint()
     }
 }
 
-class RemoveElement(private val jsonNode: JSONNode, private val property: JSONProperty, private val component: JComponent): Command {
+internal class RemoveElement(private val jsonNode: JSONNode, private val key: String, private val element: JSONElement, private val component: JComponent): Command {
     private var parent = Container()
     private var index = -1
 
@@ -38,37 +38,38 @@ class RemoveElement(private val jsonNode: JSONNode, private val property: JSONPr
     }
 
     override fun run() {
-        if( jsonNode is JSONObject ) {
-            jsonNode.removeElement(property)
-            val parent = component.parent
-            parent.remove(component)
-            parent.revalidate()
-            parent.repaint()
-        }
+        if (jsonNode is JSONObject) jsonNode.removeElement(JSONProperty(key, element))
+        else if (jsonNode is JSONArray) jsonNode.removeElement(element)
+
+        val parent = component.parent
+        parent.remove(component)
+        parent.revalidate()
+        parent.repaint()
     }
+
     override fun undo() {
-        if( jsonNode is JSONObject ) {
-            jsonNode.addElement(property)
-            parent.add(component, index)
-        }
+        if (jsonNode is JSONObject) jsonNode.addElement(JSONProperty(key, element))
+        else if (jsonNode is JSONArray) jsonNode.addElement(element)
+
+        parent.add(component, index)
     }
 }
 
-class ReplaceElement(private val jsonNode: JSONNode, private val property: JSONProperty, private val newElement: JSONElement, private val component: JComponent): Command {
+internal class ReplaceElement(private val jsonNode: JSONNode, private val key: String, private val element: JSONElement, private val newElement: JSONElement, private val component: JComponent): Command {
     override fun run() {
-        if( jsonNode is JSONObject ){
-            jsonNode.replaceElement(property.name, newElement)
-        }
+        if (jsonNode is JSONObject) jsonNode.replaceElement(key, newElement)
+        else if (jsonNode is JSONArray) jsonNode.replaceElement(element, newElement)
     }
+
     override fun undo() {
-        if( jsonNode is JSONObject ) {
-            jsonNode.replaceElement(property.name, property.element)
-            (component as JTextField).text = property.element.toString()
-        }
+        if (jsonNode is JSONObject) jsonNode.replaceElement(key, element)
+        else if (jsonNode is JSONArray) jsonNode.replaceElement(newElement, element)
+
+        (component as JTextField).text = element.toString()
     }
 }
 
-class RemoveAllElements(private val jsonObject: JSONObject, private val component: JComponent): Command {
+internal class RemoveAllElements(private val jsonObject: JSONObject, private val component: JComponent): Command {
     private val jsonBackup: List<JSONProperty> = jsonObject.value.toList()
     private val scrollPane: JScrollPane = component.components[0] as JScrollPane
     private val panel: JPanel = scrollPane.components[0] as JPanel
