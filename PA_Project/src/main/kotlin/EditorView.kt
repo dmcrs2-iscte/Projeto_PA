@@ -79,6 +79,41 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
     private fun getArrayButton(panel: JPanel, menu: JPopupMenu) =
         getButton(panel, menu, "Add Array") { text -> getArrayWidget(text) }
 
+    private fun getRemoveButton(key: String, textField: JTextField? = null, panel: JPanel, menu: JPopupMenu, element: JSONElement? = null): JButton =
+        JButton("Remove").apply {
+            addActionListener {
+                removeWidget(key, textField, panel, element)
+                menu.isVisible = false
+                revalidate()
+                repaint()
+            }
+        }
+
+    private fun getMenu(key: String, panel: JPanel, textField: JTextField? = null, element: JSONElement? = null): JPopupMenu =
+        JPopupMenu("Message").apply {
+            isLightWeightPopupEnabled = false
+
+            add(getAddButton(panel.parent as JPanel, this))
+            add(getObjectButton(panel.parent as JPanel, this))
+            add(getArrayButton(panel.parent as JPanel, this))
+            if(textField != null) add(getRemoveButton(key, textField, panel, this))
+            else if(element != null) add(getRemoveButton(key, panel = panel, menu = this, element = element))
+        }
+
+
+    private fun removeWidget(key: String, textField: JTextField?, panel: JPanel, element: JSONElement?) {
+        val text: String
+        if (textField != null) {
+            text = if (textField.text != "null") textField.text else ""
+            observers.forEach { it.elementRemoved(jsonNode, key, jsonTypeAssigner(text), panel) }
+        } else {
+            println(jsonNode)
+            if(element != null) {
+                observers.forEach { it.elementRemoved(jsonNode, key, element, panel) }
+            }
+        }
+    }
+
     private fun formatWidget(panel: JPanel) {
         panel.apply {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
@@ -103,21 +138,7 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
             addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent) {
                     if (SwingUtilities.isRightMouseButton(e)) {
-                        val menu = JPopupMenu("Message")
-
-                        menu.isLightWeightPopupEnabled = false
-
-                        val remove = JButton("Remove")
-                        remove.addActionListener {
-                            removeWidget(key, textField, panel)
-                            menu.isVisible = false
-                            revalidate()
-                            repaint()
-                        }
-                        menu.add(getAddButton(panel.parent as JPanel, menu))
-                        menu.add(getObjectButton(panel.parent as JPanel, menu))
-                        menu.add(getArrayButton(panel.parent as JPanel, menu))
-                        menu.add(remove)
+                        val menu = getMenu(key, panel, textField)
                         menu.show(this@apply, e.x, e.y)
                     }
                 }
@@ -144,14 +165,7 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
             addMouseListener(object : MouseAdapter() {
                 override fun mouseClicked(e: MouseEvent) {
                     if (SwingUtilities.isRightMouseButton(e)) {
-                        val menu = JPopupMenu("Message")
-
-                        menu.isLightWeightPopupEnabled = false
-
-                        menu.add(getAddButton(panel.parent as JPanel, menu))
-                        menu.add(getObjectButton(panel.parent as JPanel, menu))
-                        menu.add(getArrayButton(panel.parent as JPanel, menu))
-
+                        val menu = getMenu(key, panel, element = node)
                         menu.show(this@apply, e.x, e.y)
                     }
                 }
@@ -163,11 +177,6 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
 
     private fun getArrayWidget(key: String): JPanel =
         getCompositeWidget(key, JSONArray())
-
-    private fun removeWidget(key: String, textField: JTextField, panel: JPanel) {
-        val text = if (textField.text != "null") textField.text else ""
-        observers.forEach { it.elementRemoved(jsonNode, key, jsonTypeAssigner(text), panel) }
-    }
 
     private fun getTextField(key: String, element: JSONElement): JTextField {
         var oldElement = element

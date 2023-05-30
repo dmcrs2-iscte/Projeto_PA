@@ -1,8 +1,9 @@
 import java.awt.Component
 import java.awt.Container
+import java.awt.Panel
+import java.awt.ScrollPane
 import javax.swing.JComponent
 import javax.swing.JPanel
-import javax.swing.JScrollPane
 import javax.swing.JTextField
 
 
@@ -71,14 +72,12 @@ internal class ReplaceElement(private val jsonNode: JSONNode, private val key: S
 
 internal class RemoveAllElements(private val jsonObject: JSONObject, private val component: JComponent): Command {
     private val jsonBackup: List<JSONProperty> = jsonObject.value.toList()
-    private val scrollPane: JScrollPane = component.components[0] as JScrollPane
-    private val panel: JPanel = scrollPane.components[0] as JPanel
-    private val componentsBackup: List<Component> = panel.components.toList()
+    private val componentsBackup: List<Component> = component.components.toList()
 
     override fun run() {
         jsonBackup.forEach { jsonObject.removeElement(it) }
 
-        panel.removeAll()
+        component.removeAll()
         component.revalidate()
         component.repaint()
     }
@@ -86,7 +85,7 @@ internal class RemoveAllElements(private val jsonObject: JSONObject, private val
     override fun undo() {
         jsonBackup.forEach { jsonObject.addElement(it) }
 
-        componentsBackup.forEach { panel.add(it) }
+        componentsBackup.forEach { component.add(it) }
         component.revalidate()
         component.repaint()
     }
