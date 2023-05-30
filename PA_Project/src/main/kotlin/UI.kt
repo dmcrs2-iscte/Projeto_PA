@@ -6,7 +6,7 @@ import javax.swing.*
 
 class UI(private val jsonObject: JSONObject = JSONObject()) {
     private val commands = Stack<Command>()
-    fun runCommand(command: Command) {
+    private fun runCommand(command: Command) {
         commands.push(command)
         command.run()
     }
@@ -18,22 +18,23 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
         size = Dimension(600, 600)
 
 
-        val editorView = EditorView()
+        val editorView = EditorView(jsonObject, commands)
         editorView.addObserver(object : EditorViewObserver {
-            override fun elementAdded(property: JSONProperty, component: JComponent) =
-                runCommand(AddElement(jsonObject, property, component))
+            override fun elementAdded(jsonNode: JSONNode, key: String, element: JSONElement, component: JComponent) =
+                runCommand(AddElement(jsonNode, key, element, component))
 
-            override fun elementRemoved(property: JSONProperty, component: JComponent) =
-                runCommand(RemoveElement(jsonObject, property, component))
+            override fun elementRemoved(jsonNode: JSONNode, key: String, element: JSONElement, component: JComponent) =
+                runCommand(RemoveElement(jsonNode, key, element, component))
 
-            override fun elementReplaced(property: JSONProperty, newElement: JSONElement, component: JComponent) =
-                runCommand(ReplaceElement(jsonObject, property, newElement, component))
+            override fun elementReplaced(jsonNode: JSONNode, key: String, element: JSONElement, newElement: JSONElement, component: JComponent) =
+                runCommand(ReplaceElement(jsonNode, key, element, newElement, component))
         })
 
         add(panel.apply {
             layout = GridLayout(0, 2)
 
-            add(JScrollPane(editorView))
+            add(editorView)
+
             add(JSONView(jsonObject))
         }, BorderLayout.CENTER)
 

@@ -10,7 +10,7 @@ sealed interface JSONLeaf: JSONElement {
     override fun accept(v: JSONVisitor) = v.visit(this)
 }
 
-sealed interface JSONNode: JSONElement {
+sealed interface JSONNode: JSONElement, JSONObserver {
     override val value: MutableList<*>
 
     val observers: MutableList<JSONObserver>
@@ -121,6 +121,7 @@ data class JSONObject(override val value: MutableList<JSONProperty> = mutableLis
     fun addElement(element: JSONProperty) {
         if (value.any { it.name == element.name }) throw IllegalArgumentException("A JSONProperty with name '${element.name}' already exists inside this JSONObject")
         else if (value.add(element)) observers.forEach { it.elementAdded() }
+        if (element.element is JSONNode) element.element.addObserver(this)
     }
 
     fun removeElement(element: JSONProperty) {
@@ -142,6 +143,18 @@ data class JSONObject(override val value: MutableList<JSONProperty> = mutableLis
     }
 
     override fun toString() = value.joinToString (prefix = "{", postfix = "}")
+
+    override fun elementAdded() {
+        observers.forEach { it.elementAdded() }
+    }
+
+    override fun elementRemoved() {
+        observers.forEach { it.elementRemoved() }
+    }
+
+    override fun elementReplaced() {
+        observers.forEach { it.elementReplaced() }
+    }
 }
 
 data class JSONArray(override val value: MutableList<JSONElement> = mutableListOf()): JSONNode {
@@ -149,6 +162,7 @@ data class JSONArray(override val value: MutableList<JSONElement> = mutableListO
 
     fun addElement(element: JSONElement) {
         if (value.add(element)) observers.forEach { it.elementAdded() }
+        if (element is JSONNode) element.addObserver(this)
     }
 
     fun removeElement(element: JSONElement) {
@@ -166,6 +180,18 @@ data class JSONArray(override val value: MutableList<JSONElement> = mutableListO
     }
 
     override fun toString() = value.joinToString(prefix = "[", postfix = "]")
+
+    override fun elementAdded() {
+        observers.forEach { it.elementAdded() }
+    }
+
+    override fun elementRemoved() {
+        observers.forEach { it.elementRemoved() }
+    }
+
+    override fun elementReplaced() {
+        observers.forEach { it.elementReplaced() }
+    }
 }
 
 interface JSONObserver {
