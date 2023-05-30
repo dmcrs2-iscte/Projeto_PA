@@ -228,7 +228,7 @@ class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Com
 }
 
 interface EditorViewObserver {
-    fun elementAdded(property: JSONProperty, component: JComponent)
-    fun elementRemoved(property: JSONProperty, component: JComponent)
-    fun elementReplaced(property: JSONProperty, newElement: JSONElement, component: JComponent)
+    fun elementAdded(jsonNode: JSONNode, property: JSONProperty, component: JComponent)
+    fun elementRemoved(jsonNode: JSONNode, property: JSONProperty, component: JComponent)
+    fun elementReplaced(jsonNode: JSONNode, property: JSONProperty, newElement: JSONElement, component: JComponent)
 }
