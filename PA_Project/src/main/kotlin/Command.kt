@@ -17,7 +17,7 @@ internal class AddElement(private val jsonNode: JSONNode, private val key: Strin
 
     override fun undo() {
         if (jsonNode is JSONObject) jsonNode.removeElement(JSONProperty(key, element))
-        else if (jsonNode is JSONArray) jsonNode.addElement(element)
+        else if (jsonNode is JSONArray) jsonNode.removeElement(element)
 
         val parent = component.parent
         parent.remove(component)
