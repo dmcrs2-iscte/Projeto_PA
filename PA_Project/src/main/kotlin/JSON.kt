@@ -63,16 +63,16 @@ sealed interface JSONNode: JSONElement, JSONObserver {
         fun getIndentation(tbs: Int): String = "\n" + "\t".repeat(tbs)
 
         var jsonToString = if (this is JSONObject) "{" else "["
-        value.forEach { jsonToString += getIndentation(tabs) +
+        value.forEach {
+            jsonToString += getIndentation(tabs) +
             when (it) {
-                is JSONNode -> it.toTree(tabs + 1)
+                is JSONNode -> it.toTree(tabs + 1) + ","
                 is JSONProperty -> it.toTree(tabs) + ","
                 else -> it.toString() + ","
             }
         }
-        if (this.value.isNotEmpty()) {
-            jsonToString = jsonToString.dropLast(1)
-        }
+        if (this.value.isNotEmpty()) jsonToString = jsonToString.dropLast(1)
+
         jsonToString += getIndentation(tabs - 1) + if (this is JSONObject) "}" else "]"
         return jsonToString
     }

@@ -109,8 +109,7 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
             text = if (textField.text != "null") textField.text else ""
             observers.forEach { it.elementRemoved(jsonNode, key, jsonTypeAssigner(text), panel) }
         } else {
-            println(jsonNode)
-            if(element != null) {
+            if (element != null) {
                 observers.forEach { it.elementRemoved(jsonNode, key, element, panel) }
             }
         }
