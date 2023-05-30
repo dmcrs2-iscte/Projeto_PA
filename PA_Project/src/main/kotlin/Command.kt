@@ -1,9 +1,6 @@
 import java.awt.Component
 import java.awt.Container
-import java.awt.Panel
-import java.awt.ScrollPane
 import javax.swing.JComponent
-import javax.swing.JPanel
 import javax.swing.JTextField
 
 
