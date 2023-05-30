@@ -79,6 +79,10 @@ sealed interface JSONNode: JSONElement, JSONObserver {
 }
 
 data class JSONProperty(internal val name: String, internal val element: JSONElement) {
+    init {
+        if (name.isEmpty()) throw IllegalArgumentException("Property name must not be empty")
+    }
+
     fun accept(v: JSONVisitor) {
         if (v.visit(this)) element.accept(v)
     }

@@ -366,13 +366,5 @@ class TestJSON {
         )))
 
         jsonObject.replaceElement("c", JSONNumber(4))
-
-        val jsonArray = JSONArray(mutableListOf(
-            JSONObject(mutableListOf(
-                JSONProperty("1", JSONNumber(1))
-            ))
-        ))
-
-        println(jsonArray.toTree())
     }
 }
