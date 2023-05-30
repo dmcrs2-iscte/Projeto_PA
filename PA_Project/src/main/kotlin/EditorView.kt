@@ -6,7 +6,7 @@ import java.awt.event.MouseEvent
 import java.util.*
 import javax.swing.*
 
-class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Command>) : JPanel() {
+class EditorView(private val jsonNode: JSONNode, private val observer: EditorViewObserver) : JPanel() {
     private val observers: MutableList<EditorViewObserver> = mutableListOf()
 
     init {
@@ -17,12 +17,6 @@ class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Com
     }
 
     fun addObserver(observer: EditorViewObserver) = observers.add(observer)
-
-    private fun runCommand(command: Command) {
-        commands.push(command)
-        command.run()
-    }
-
 
     private fun getPanel(): JPanel =
         JPanel().apply {
@@ -46,7 +40,6 @@ class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Com
                 }
             })
         }
-
 
     private fun getButton(panel: JPanel, menu: JPopupMenu, buttonText: String, widgetFunction: (String) -> Component): JButton {
         val button = JButton(buttonText)
@@ -86,7 +79,6 @@ class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Com
 
     private fun getArrayButton(panel: JPanel, menu: JPopupMenu) =
         getButton(panel, menu, "Add Array") { text -> getArrayWidget(text) }
-
 
     private fun formatWidget(panel: JPanel) {
         panel.apply {
@@ -133,41 +125,25 @@ class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Com
             })
         }
 
-    private fun addLabelToWidget(panel: JPanel, key: String) {
-        panel.apply {
-            val label = JPanel().apply {
-                layout = FlowLayout(FlowLayout.LEFT)
-                if (key.isNotEmpty()) add(JLabel(key)) else add(JLabel("   "))
-            }
-            add(label)
-        }
+    private fun getLabel() {
+
     }
 
     private fun getObjectWidget(key: String): JPanel =
         JPanel().apply {
             formatWidget(this)
 
-            val jsonObject = JSONObject()
-
             val label = JPanel().apply {
                 layout = FlowLayout(FlowLayout.LEFT)
                 if (key.isNotEmpty()) add(JLabel(key)) else add(JLabel("   "))
             }
             add(label)
 
+            val jsonObject = JSONObject()
             observers.forEach { it.elementAdded(jsonNode, key, jsonObject, this) }
 
-            val objectPanel = EditorView(jsonObject, commands)
-            objectPanel.addObserver(object : EditorViewObserver {
-                override fun elementAdded(jsonNode: JSONNode, key: String, element: JSONElement, component: JComponent) =
-                    runCommand(AddElement(jsonNode, key, element, component))
-
-                override fun elementRemoved(jsonNode: JSONNode, key: String, element: JSONElement, component: JComponent) =
-                    runCommand(RemoveElement(jsonNode, key, element, component))
-
-                override fun elementReplaced(jsonNode: JSONNode, key: String, element: JSONElement, newElement: JSONElement, component: JComponent) =
-                    runCommand(ReplaceElement(jsonNode, key, element, newElement, component))
-            })
+            val objectPanel = EditorView(jsonObject, observer)
+            objectPanel.addObserver(observer)
             label.add(objectPanel)
 
             val panel = this
@@ -192,43 +168,18 @@ class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Com
         JPanel().apply {
             formatWidget(this)
 
-            val jsonArray = JSONArray()
-
             val label = JPanel().apply {
                 layout = FlowLayout(FlowLayout.LEFT)
                 if (key.isNotEmpty()) add(JLabel(key)) else add(JLabel("   "))
             }
             add(label)
 
+            val jsonArray = JSONArray()
+
             observers.forEach { it.elementAdded(jsonNode, key, jsonArray, this) }
 
-            val arrayPanel = EditorView(jsonArray, commands)
-            arrayPanel.addObserver(object : EditorViewObserver {
-                override fun elementAdded(
-                    jsonNode: JSONNode,
-                    key: String,
-                    element: JSONElement,
-                    component: JComponent
-                ) =
-                    runCommand(AddElement(jsonNode, key, element, component))
-
-                override fun elementRemoved(
-                    jsonNode: JSONNode,
-                    key: String,
-                    element: JSONElement,
-                    component: JComponent
-                ) =
-                    runCommand(RemoveElement(jsonNode, key, element, component))
-
-                override fun elementReplaced(
-                    jsonNode: JSONNode,
-                    key: String,
-                    element: JSONElement,
-                    newElement: JSONElement,
-                    component: JComponent
-                ) =
-                    runCommand(ReplaceElement(jsonNode, key, element, newElement, component))
-            })
+            val arrayPanel = EditorView(jsonArray, observer)
+            arrayPanel.addObserver(observer)
             label.add(arrayPanel)
 
             val panel = this
@@ -288,11 +239,5 @@ class EditorView(private val jsonNode: JSONNode, private val commands: Stack<Com
 interface EditorViewObserver {
     fun elementAdded(jsonNode: JSONNode, key: String, element: JSONElement, component: JComponent)
     fun elementRemoved(jsonNode: JSONNode, key: String, element: JSONElement, component: JComponent)
-    fun elementReplaced(
-        jsonNode: JSONNode,
-        key: String,
-        element: JSONElement,
-        newElement: JSONElement,
-        component: JComponent
-    )
+    fun elementReplaced(jsonNode: JSONNode, key: String, element: JSONElement, newElement: JSONElement, component: JComponent)
 }
