@@ -27,36 +27,46 @@ class EditorView : JPanel() {
                 override fun mouseClicked(e: MouseEvent) {
                     if (SwingUtilities.isRightMouseButton(e)) {
                         val menu = JPopupMenu("Message")
-                        val add = JButton("Add")
-                        add.addActionListener {
-                            val text = JOptionPane.showInputDialog(panel, "text")
-                            if (text != null) {
-                                if (text.isEmpty())
-                                    JOptionPane.showMessageDialog(
-                                        panel,
-                                        "Nome da propriedade não pode ser vazio!",
-                                        "Josue",
-                                        JOptionPane.ERROR_MESSAGE
-                                    )
-                                else add(getWidget(text))
-                            }
-                            menu.isVisible = false
-                            revalidate()
-                            repaint()
-                        }
-                        menu.add(add)
 
-                        /*val remove = JButton("Remove")
-                        remove.addActionListener {
-
-                        }
-                        menu.add(remove)*/
+                        menu.add(addAddButton(panel,menu))
 
                         menu.show(this@apply, e.x, e.y)
                     }
                 }
             })
         }
+
+    private fun addAddButton(panel: JPanel, menu: JPopupMenu): JButton{
+        val add = JButton("Add")
+        add.addActionListener {
+                val text = JOptionPane.showInputDialog(panel, "text")
+                if (text != null) {
+                    if (text.isEmpty()) {
+                        JOptionPane.showMessageDialog(
+                            panel,
+                            "Nome da propriedade não pode ser vazio!",
+                            "Josue",
+                            JOptionPane.ERROR_MESSAGE
+                        )
+                    }else {
+                        try {
+                            panel.add(getWidget(text))
+                        }catch (e: IllegalArgumentException){
+                            JOptionPane.showMessageDialog(
+                                panel,
+                                "Nome da propriedade não pode ser igual a outro dentro do mesmo objeto!",
+                                "Josue",
+                                JOptionPane.ERROR_MESSAGE
+                            )
+                        }
+                    }
+                }
+            menu.isVisible = false
+            revalidate()
+            repaint()
+        }
+        return add
+    }
 
     private fun jsonTypeAssigner(value: String): JSONElement {
         return when {
@@ -80,13 +90,40 @@ class EditorView : JPanel() {
             val property = JSONProperty(key, JSONEmpty())
             observers.forEach { it.elementAdded(property, this) }
 
-            add(getTextField(property))
+            val textField = getTextField(property)
+            add(textField)
+
+            val panel = this
+
+            addMouseListener(object : MouseAdapter() {
+                override fun mouseClicked(e: MouseEvent) {
+                    if (SwingUtilities.isRightMouseButton(e)) {
+                        val menu = JPopupMenu("Message")
+
+                        val source = e.source
+                        if (source is JPanel && source.components.isNotEmpty()) {
+                            val remove = JButton("Remove")
+                            remove.addActionListener {
+                                removeWidget(property, textField, panel)
+                                menu.isVisible = false
+                                revalidate()
+                                repaint()
+                            }
+                            menu.add(remove)
+                        }
+                        menu.add(addAddButton(panel.parent as JPanel, menu))
+
+                        menu.show(this@apply, e.x, e.y)
+                    }
+                }
+            })
+
         }
 
-    private fun getTextField(property: JSONProperty): JTextField =
-        JTextField().apply {
+    private fun getTextField(property: JSONProperty): JTextField {
+        var oldProperty = property
+        val textField = JTextField().apply {
             val textField = this
-            var oldProperty = property
             addKeyListener(object : KeyAdapter() {
                 override fun keyPressed(e: KeyEvent) {
                     if (e.keyCode == KeyEvent.VK_ENTER) {
@@ -99,6 +136,13 @@ class EditorView : JPanel() {
                 }
             })
         }
+        return textField
+    }
+
+    private fun removeWidget(property: JSONProperty, textField: JTextField, panel: JPanel){
+        val text = if(textField.text != "null") textField.text else ""
+        observers.forEach { it.elementRemoved(JSONProperty(property.name, jsonTypeAssigner(text)), panel) }
+    }
 
 }
 

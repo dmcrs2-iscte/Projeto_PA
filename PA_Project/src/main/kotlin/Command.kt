@@ -30,7 +30,13 @@ class RemoveElement(private val jsonObject: JSONObject, private val property: JS
         index = parent.components.toList().indexOf(component)
     }
 
-    override fun run() = jsonObject.removeElement(property)
+    override fun run() {
+        jsonObject.removeElement(property)
+        val parent = component.parent
+        parent.remove(component)
+        parent.revalidate()
+        parent.repaint()
+    }
     override fun undo() {
         jsonObject.addElement(property)
         parent.add(component, index)
