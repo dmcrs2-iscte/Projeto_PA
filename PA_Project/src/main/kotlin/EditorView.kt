@@ -7,11 +7,13 @@ import javax.swing.*
 
 class EditorView(private val jsonNode: JSONNode, private val observer: EditorViewObserver) : JPanel() {
     private val observers: MutableList<EditorViewObserver> = mutableListOf()
+    internal val mainPanel: JPanel
 
     init {
         layout = GridLayout()
+        mainPanel = getPanel()
         add(ScrollPane().apply {
-            add(getPanel())
+            add(mainPanel)
         })
     }
 

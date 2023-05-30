@@ -52,7 +52,7 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
             })
             add(JButton("Delete All").apply {
                 addActionListener {
-                runCommand(RemoveAllElements(jsonObject, editorView))
+                runCommand(RemoveAllElements(jsonObject, editorView.mainPanel))
                     revalidate()
                     repaint()
                 }

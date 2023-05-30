@@ -53,6 +53,8 @@ internal class RemoveElement(private val jsonNode: JSONNode, private val key: St
         else if (jsonNode is JSONArray) jsonNode.addElement(element)
 
         parent.add(component, index)
+        parent.revalidate()
+        parent.repaint()
     }
 }
 
