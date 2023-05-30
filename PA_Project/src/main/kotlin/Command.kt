@@ -2,6 +2,7 @@ import java.awt.Component
 import java.awt.Container
 import javax.swing.JComponent
 import javax.swing.JPanel
+import javax.swing.JScrollPane
 import javax.swing.JTextField
 
 
@@ -69,7 +70,8 @@ class ReplaceElement(private val jsonNode: JSONNode, private val property: JSONP
 
 class RemoveAllElements(private val jsonObject: JSONObject, private val component: JComponent): Command {
     private val jsonBackup: List<JSONProperty> = jsonObject.value.toList()
-    private val panel: JPanel = component.components[0] as JPanel
+    private val scrollPane: JScrollPane = component.components[0] as JScrollPane
+    private val panel: JPanel = scrollPane.components[0] as JPanel
     private val componentsBackup: List<Component> = panel.components.toList()
 
     override fun run() {
