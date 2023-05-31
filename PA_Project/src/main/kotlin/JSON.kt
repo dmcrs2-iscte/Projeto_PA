@@ -132,6 +132,10 @@ data class JSONEmpty(override val value: Nothing? = null): JSONLeaf {
 }
 
 data class JSONObject(override val value: MutableList<JSONProperty> = mutableListOf()): JSONNode {
+    init{
+        if (value.isNotEmpty()) value.forEach { if (it.element is JSONNode) it.element.addObserver(this) }
+    }
+
     override val observers: MutableList<JSONObserver> = mutableListOf()
 
     fun addElement(property: JSONProperty) {
@@ -167,6 +171,10 @@ data class JSONObject(override val value: MutableList<JSONProperty> = mutableLis
 }
 
 data class JSONArray(override val value: MutableList<JSONElement> = mutableListOf()): JSONNode {
+    init{
+        if (value.isNotEmpty()) value.forEach { if (it is JSONNode) it.addObserver(this) }
+    }
+
     override val observers: MutableList<JSONObserver> = mutableListOf()
 
     fun addElement(element: JSONElement) {

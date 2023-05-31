@@ -15,6 +15,28 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
         add(ScrollPane().apply {
             add(mainPanel)
         })
+
+        if (jsonNode.value.isNotEmpty()) generateWidgetsFromJSON()
+    }
+
+    private fun generateWidgetsFromJSON() {
+        if (jsonNode is JSONObject) {
+            jsonNode.value.forEach {
+                when (it.element) {
+                    is JSONObject -> mainPanel.add(getObjectWidget(it.name, it.element))
+                    is JSONArray -> mainPanel.add(getArrayWidget(it.name, it.element))
+                    else -> mainPanel.add(getWidget(it.name, it.element))
+                }
+            }
+        } else if (jsonNode is JSONArray) {
+            jsonNode.value.forEach {
+                when (it) {
+                    is JSONObject -> mainPanel.add(getObjectWidget("", it))
+                    is JSONArray -> mainPanel.add(getArrayWidget("", it))
+                    else -> mainPanel.add(getWidget("", it))
+                }
+            }
+        }
     }
 
     fun addObserver(observer: EditorViewObserver) = observers.add(observer)
@@ -124,7 +146,7 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
         }
     }
 
-    internal fun getWidget(key: String, existingElement: JSONElement?= null): JPanel =
+    private fun getWidget(key: String, existingElement: JSONElement?= null): JPanel =
         JPanel().apply {
             formatWidget(this)
 
@@ -174,11 +196,11 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
             })
         }
 
-    internal fun getObjectWidget(key: String): JPanel =
-        getCompositeWidget(key, JSONObject())
+    private fun getObjectWidget(key: String, jsonObject: JSONObject = JSONObject()): JPanel =
+        getCompositeWidget(key, jsonObject)
 
-    internal fun getArrayWidget(key: String): JPanel =
-        getCompositeWidget(key, JSONArray())
+    private fun getArrayWidget(key: String, jsonArray: JSONArray = JSONArray()): JPanel =
+        getCompositeWidget(key, jsonArray)
 
     private fun getTextField(key: String, element: JSONElement): JTextField {
         var oldElement = element
