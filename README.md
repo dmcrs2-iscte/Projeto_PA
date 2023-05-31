@@ -22,6 +22,7 @@ In order to create a JSON Object, the user may use the JSONObject data class and
 
 As an example, say we want to define a JSON object representing John Doe, a 35 year old teacher who teaches algebra and calculus. Here's how it could look:
 
+```kotlin
 val jsonObject = JSONObject(
 	JSONProperty("first name", JSONString("John")),
         JSONProperty("last name", JSONString("Doe")),
@@ -32,6 +33,7 @@ val jsonObject = JSONObject(
             	JSONString("calculus")
         )))
 ))
+```
 
 The user may also add, remove and replace values after creating the object, using the functions addElement, removeElement and replaceElement. These functions take different parameters depending on them being used on an object or an array.
 
