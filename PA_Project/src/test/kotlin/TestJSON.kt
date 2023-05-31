@@ -2,29 +2,85 @@ import kotlin.test.*
 
 class TestJSON {
 
-    private val jsonString = JSONString("abc")
-    private val jsonNumber = JSONNumber(123)
-    private val jsonBoolean = JSONBoolean(true)
-    private val jsonEmpty = JSONEmpty()
-    private val jsonFloat = JSONFloat(1.23)
+    @Test
+    fun testAddElement() {
+        val jsonObject = JSONObject(mutableListOf(
+            JSONProperty("first name", JSONString("John")),
+            JSONProperty("last name", JSONString("Doe")),
+            JSONProperty("age", JSONNumber(35)),
+            JSONProperty("courses", JSONArray(mutableListOf(
+                JSONString("CALC"),
+                JSONString("ALG"),
+                JSONString("PROG")
+            )))
+        ))
 
-    private val jsonObject1 = JSONObject(mutableListOf(JSONProperty("jsonString", jsonString), JSONProperty("jsonNumber", jsonNumber)))
-    private val jsonArray = JSONArray(mutableListOf(jsonObject1, jsonBoolean, jsonEmpty))
+        jsonObject.addElement(JSONProperty("teacher", JSONBoolean(true)))
 
-    private val jsonObject = JSONObject(mutableListOf(JSONProperty("jsonArray", jsonArray), JSONProperty("jsonFloat", jsonFloat)))
+        val expected = JSONObject(mutableListOf(
+            JSONProperty("first name", JSONString("John")),
+            JSONProperty("last name", JSONString("Doe")),
+            JSONProperty("age", JSONNumber(35)),
+            JSONProperty("courses", JSONArray(mutableListOf(
+                JSONString("CALC"),
+                JSONString("ALG"),
+                JSONString("PROG")
+            ))),
+            JSONProperty("teacher", JSONBoolean(true))
+        ))
+
+        assertEquals(expected, jsonObject)
+
+        assertFailsWith<IllegalArgumentException> {
+            jsonObject.addElement(JSONProperty("teacher", JSONBoolean(true)))
+        }
+    }
 
     @Test
-    fun testJSON() {
-        jsonObject.addElement(JSONProperty("newString", jsonString))
-        val newObject = JSONObject(
-            mutableListOf(
-                JSONProperty("jsonArray", jsonArray),
-                JSONProperty("jsonFloat", jsonFloat),
-                JSONProperty("newString", jsonString)
-            )
-        )
-        assertEquals(jsonObject, newObject)
-        assertFailsWith<IllegalArgumentException> { jsonObject.addElement(JSONProperty("newString", jsonEmpty)) }
+    fun testRemoveElement() {
+        val jsonObject = JSONObject(mutableListOf(
+            JSONProperty("first name", JSONString("John")),
+            JSONProperty("last name", JSONString("Doe")),
+            JSONProperty("age", JSONNumber(35)),
+            JSONProperty("courses", JSONArray(mutableListOf(
+                JSONString("CALC"),
+                JSONString("ALG"),
+                JSONString("PROG")
+            )))
+        ))
+
+        jsonObject.removeElement(JSONProperty("age", JSONNumber(35)))
+
+        val expected = JSONObject(mutableListOf(
+            JSONProperty("first name", JSONString("John")),
+            JSONProperty("last name", JSONString("Doe")),
+            JSONProperty("courses", JSONArray(mutableListOf(
+                JSONString("CALC"),
+                JSONString("ALG"),
+                JSONString("PROG")
+            )))
+        ))
+
+        assertEquals(expected, jsonObject)
+
+        jsonObject.removeElement(JSONProperty("age", JSONNumber(35)))
+        assertEquals(expected, jsonObject)
+    }
+
+    @Test
+    fun testReplaceElement() {
+        val jsonObject = JSONObject(mutableListOf(
+            JSONProperty("first name", JSONString("John")),
+            JSONProperty("last name", JSONString("Doe")),
+            JSONProperty("age", JSONNumber(35)),
+            JSONProperty("courses", JSONArray(mutableListOf(
+                JSONString("CALC"),
+                JSONString("ALG"),
+                JSONString("PROG")
+            )))
+        ))
+
+        jsonObject.replaceElement("age", JSONNumber(45))
     }
 
     @Test
