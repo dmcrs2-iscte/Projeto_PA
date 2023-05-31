@@ -124,12 +124,13 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
         }
     }
 
-    private fun getWidget(key: String): JPanel =
+    internal fun getWidget(key: String, existingElement: JSONElement?= null): JPanel =
         JPanel().apply {
             formatWidget(this)
 
             if (key.isNotEmpty()) add(JLabel(key)) else add(JLabel("   "))
-            val element = JSONEmpty()
+            var element: JSONElement = JSONEmpty()
+            if( existingElement != null ) element = existingElement
             observers.forEach { it.elementAdded(jsonNode, key, element, this) }
 
             val textField = getTextField(key, element)
@@ -173,16 +174,17 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
             })
         }
 
-    private fun getObjectWidget(key: String): JPanel =
+    internal fun getObjectWidget(key: String): JPanel =
         getCompositeWidget(key, JSONObject())
 
-    private fun getArrayWidget(key: String): JPanel =
+    internal fun getArrayWidget(key: String): JPanel =
         getCompositeWidget(key, JSONArray())
 
     private fun getTextField(key: String, element: JSONElement): JTextField {
         var oldElement = element
         val textField = JTextField().apply {
             val textField = this
+            if( element !is JSONEmpty ) text = element.toString()
             addKeyListener(object : KeyAdapter() {
                 override fun keyPressed(e: KeyEvent) {
                     if (e.keyCode == KeyEvent.VK_ENTER) {

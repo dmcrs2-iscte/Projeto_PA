@@ -8,8 +8,8 @@ sealed interface JSONVisitor {
     fun visit(p: JSONProperty): Boolean = true
 }
 
-internal class GetValuesByName(private val name: String) : JSONVisitor {
-    private var list = mutableListOf<JSONElement>()
+internal class GetElementsByKey(private val name: String) : JSONVisitor {
+    private val list = mutableListOf<JSONElement>()
 
     override fun visit(p: JSONProperty) : Boolean {
         if (p.name == name) list.add(p.element)

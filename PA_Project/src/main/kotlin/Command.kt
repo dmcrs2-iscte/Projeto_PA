@@ -16,7 +16,7 @@ internal class AddElement(private val jsonNode: JSONNode, private val key: Strin
     }
 
     override fun undo() {
-        if (jsonNode is JSONObject) jsonNode.removeElement(JSONProperty(key, element))
+        if (jsonNode is JSONObject) jsonNode.removeElement(key)
         else if (jsonNode is JSONArray) jsonNode.removeElement(element)
 
         val parent = component.parent
@@ -36,7 +36,7 @@ internal class RemoveElement(private val jsonNode: JSONNode, private val key: St
     }
 
     override fun run() {
-        if (jsonNode is JSONObject) jsonNode.removeElement(JSONProperty(key, element))
+        if (jsonNode is JSONObject) jsonNode.removeElement(key)
         else if (jsonNode is JSONArray) jsonNode.removeElement(element)
 
         val parent = component.parent
@@ -74,7 +74,7 @@ internal class RemoveAllElements(private val jsonObject: JSONObject, private val
     private val componentsBackup: List<Component> = component.components.toList()
 
     override fun run() {
-        jsonBackup.forEach { jsonObject.removeElement(it) }
+        jsonBackup.forEach { jsonObject.removeElement(it.name) }
 
         component.removeAll()
         component.revalidate()

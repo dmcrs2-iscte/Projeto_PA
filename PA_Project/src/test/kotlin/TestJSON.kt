@@ -10,26 +10,37 @@ class TestJSON {
             JSONProperty("age", JSONNumber(35)),
             JSONProperty("courses", JSONArray(mutableListOf(
                 JSONString("CALC"),
-                JSONString("ALG"),
-                JSONString("PROG")
+                JSONString("ALG")
             )))
         ))
 
-        jsonObject.addElement(JSONProperty("teacher", JSONBoolean(true)))
+        val jsonArray = JSONArray(mutableListOf(
+            JSONNumber(1),
+            JSONNumber(2)
+        ))
 
-        val expected = JSONObject(mutableListOf(
+        jsonObject.addElement(JSONProperty("teacher", JSONBoolean(true)))
+        jsonArray.addElement(JSONNumber(3))
+
+        val expectedJsonObject = JSONObject(mutableListOf(
             JSONProperty("first name", JSONString("John")),
             JSONProperty("last name", JSONString("Doe")),
             JSONProperty("age", JSONNumber(35)),
             JSONProperty("courses", JSONArray(mutableListOf(
                 JSONString("CALC"),
-                JSONString("ALG"),
-                JSONString("PROG")
+                JSONString("ALG")
             ))),
             JSONProperty("teacher", JSONBoolean(true))
         ))
 
-        assertEquals(expected, jsonObject)
+        val expectedJsonArray = JSONArray(mutableListOf(
+            JSONNumber(1),
+            JSONNumber(2),
+            JSONNumber(3)
+        ))
+
+        assertEquals(expectedJsonObject, jsonObject)
+        assertEquals(expectedJsonArray, jsonArray)
 
         assertFailsWith<IllegalArgumentException> {
             jsonObject.addElement(JSONProperty("teacher", JSONBoolean(true)))
@@ -44,27 +55,38 @@ class TestJSON {
             JSONProperty("age", JSONNumber(35)),
             JSONProperty("courses", JSONArray(mutableListOf(
                 JSONString("CALC"),
-                JSONString("ALG"),
-                JSONString("PROG")
+                JSONString("ALG")
             )))
         ))
 
-        jsonObject.removeElement(JSONProperty("age", JSONNumber(35)))
+        val jsonArray = JSONArray(mutableListOf(
+            JSONNumber(1),
+            JSONNumber(2)
+        ))
 
-        val expected = JSONObject(mutableListOf(
+        jsonObject.removeElement("age")
+        jsonArray.removeElement(JSONNumber(2))
+
+        val expectedJsonObject = JSONObject(mutableListOf(
             JSONProperty("first name", JSONString("John")),
             JSONProperty("last name", JSONString("Doe")),
             JSONProperty("courses", JSONArray(mutableListOf(
                 JSONString("CALC"),
-                JSONString("ALG"),
-                JSONString("PROG")
+                JSONString("ALG")
             )))
         ))
 
-        assertEquals(expected, jsonObject)
+        val expectedJsonArray = JSONArray(mutableListOf(
+            JSONNumber(1)
+        ))
 
-        jsonObject.removeElement(JSONProperty("age", JSONNumber(35)))
-        assertEquals(expected, jsonObject)
+        assertEquals(expectedJsonObject, jsonObject)
+        assertEquals(expectedJsonArray, jsonArray)
+
+        jsonObject.removeElement("age")
+        assertEquals(expectedJsonObject, jsonObject)
+        jsonArray.removeElement(JSONNumber(2))
+        assertEquals(expectedJsonArray, jsonArray)
     }
 
     @Test
@@ -75,35 +97,59 @@ class TestJSON {
             JSONProperty("age", JSONNumber(35)),
             JSONProperty("courses", JSONArray(mutableListOf(
                 JSONString("CALC"),
-                JSONString("ALG"),
-                JSONString("PROG")
+                JSONString("ALG")
             )))
         ))
 
+        val jsonArray = JSONArray(mutableListOf(
+            JSONNumber(1),
+            JSONNumber(2)
+        ))
+
         jsonObject.replaceElement("age", JSONNumber(45))
+        jsonArray.replaceElement(JSONNumber(2), JSONNumber(3))
+
+        val expectedJsonObject = JSONObject(mutableListOf(
+            JSONProperty("first name", JSONString("John")),
+            JSONProperty("last name", JSONString("Doe")),
+            JSONProperty("age", JSONNumber(45)),
+            JSONProperty("courses", JSONArray(mutableListOf(
+                JSONString("CALC"),
+                JSONString("ALG")
+            )))
+        ))
+
+        val expectedJsonArray = JSONArray(mutableListOf(
+            JSONNumber(1),
+            JSONNumber(3)
+        ))
+
+        assertEquals(expectedJsonObject, jsonObject)
+        assertEquals(expectedJsonArray, jsonArray)
+
+        jsonObject.replaceElement("doesNotExist", JSONNumber(2))
+        assertEquals(expectedJsonObject, jsonObject)
+        jsonArray.replaceElement(JSONNumber(4), JSONNumber(5))
+        assertEquals(expectedJsonArray, jsonArray)
     }
 
     @Test
-    fun testGetValueByName() {
-        val array = JSONArray(
-            mutableListOf(
-                JSONObject(
-                    mutableListOf(
-                        JSONProperty("numero", JSONNumber(1)),
-                        JSONProperty("nome", JSONString("eu"))
-                    )
-                ),
-                JSONObject(
-                    mutableListOf(
-                        JSONProperty("numero", JSONNumber(2)),
-                        JSONProperty("nome", JSONString("tu"))
-                    )
-                )
-            )
+    fun testGetElementsByKey() {
+        val array = JSONArray(mutableListOf(
+            JSONObject(mutableListOf(
+                JSONProperty("number", JSONNumber(1)),
+                JSONProperty("name", JSONString("John"))
+            )),
+            JSONObject(mutableListOf(
+                JSONProperty("number", JSONNumber(2)),
+                JSONProperty("name", JSONString("Mary"))
+            )))
         )
 
         val expected = mutableListOf<JSONElement>(JSONNumber(1), JSONNumber(2))
-        assertEquals(expected, array.getValuesByName("numero"))
+
+        assertEquals(expected, array.getElementsByKey("number"))
+        assertNotEquals(expected, array.getElementsByKey("name"))
     }
 
     @Test
