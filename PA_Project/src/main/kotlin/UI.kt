@@ -34,8 +34,8 @@ class UI(private val jsonObject: JSONObject = JSONObject()) {
         add(panel.apply {
             layout = GridLayout(0, 2)
 
-            add(editorView)
-            add(JSONView(jsonObject))
+            add(JScrollPane(editorView))
+            add(JScrollPane(JSONView(jsonObject)))
         }, BorderLayout.CENTER)
 
         add(JPanel().apply {

@@ -10,11 +10,9 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
     internal val mainPanel: JPanel
 
     init {
-        layout = GridLayout()
+        layout = GridLayout(1, 1)
         mainPanel = getPanel()
-        add(ScrollPane().apply {
-            add(mainPanel)
-        })
+        add(mainPanel)
 
         if (jsonNode.value.isNotEmpty()) generateWidgetsFromJSON()
     }
@@ -139,16 +137,16 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
 
     private fun formatWidget(panel: JPanel) {
         panel.apply {
-            layout = BoxLayout(this, BoxLayout.X_AXIS)
             alignmentX = Component.LEFT_ALIGNMENT
             alignmentY = Component.TOP_ALIGNMENT
-            border = BorderFactory.createLineBorder(Color.black)
+            border = BorderFactory.createEmptyBorder(10, 10, 10, 10)
         }
     }
 
     private fun getWidget(key: String, existingElement: JSONElement?= null): JPanel =
         JPanel().apply {
             formatWidget(this)
+            layout = BoxLayout(this, BoxLayout.X_AXIS)
 
             if (key.isNotEmpty()) add(JLabel(key)) else add(JLabel("   "))
             var element: JSONElement = JSONEmpty()
@@ -172,9 +170,12 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
     private fun getCompositeWidget(key: String, node: JSONNode): JPanel =
         JPanel().apply {
             formatWidget(this)
+            layout = GridLayout(1,1)
 
             val label = JPanel().apply {
-                layout = FlowLayout(FlowLayout.LEFT)
+                layout = BoxLayout(this, BoxLayout.X_AXIS)
+                alignmentX = Component.LEFT_ALIGNMENT
+                alignmentY = Component.TOP_ALIGNMENT
                 if (key.isNotEmpty()) add(JLabel(key)) else add(JLabel("   "))
             }
             add(label)
@@ -224,7 +225,7 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
 
     private fun jsonTypeAssigner(value: String): JSONElement {
         return when {
-            value.startsWith("\"") && value.endsWith("\"") -> JSONString(value)
+            value.startsWith("\"") && value.endsWith("\"") -> JSONString(value.drop(1).dropLast(1))
             value.toIntOrNull() != null -> JSONNumber(value.toInt())
             value.toDoubleOrNull() != null -> JSONFloat(value.toDouble())
             value.toBooleanStrictOrNull() != null -> JSONBoolean(value.toBooleanStrict())
