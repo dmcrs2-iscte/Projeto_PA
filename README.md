@@ -1,4 +1,4 @@
-Purpose:
+# *Purpose*:
 
 This library was created with the purpose of representing JSON files in Kotlin. It includes representations for every JSON data type, including Number, Boolean, String, Empty, Object and Array.
 
