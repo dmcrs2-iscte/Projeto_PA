@@ -1,3 +1,6 @@
+package mvc
+
+import json.*
 import java.awt.*
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
@@ -149,7 +152,7 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
             layout = BoxLayout(this, BoxLayout.X_AXIS)
 
             if (key.isNotEmpty()) add(JLabel(key)) else add(JLabel("   "))
-            var element: JSONElement = JSONEmpty()
+            var element: JSONElement = JSONNull()
             if( existingElement != null ) element = existingElement
             observers.forEach { it.elementAdded(jsonNode, key, element, this) }
 
@@ -182,9 +185,9 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
 
             observers.forEach { it.elementAdded(jsonNode, key, node, this) }
 
-            val objectPanel = EditorView(node, observer)
-            objectPanel.addObserver(observer)
-            label.add(objectPanel)
+            val nodePanel = EditorView(node, observer)
+            nodePanel.addObserver(observer)
+            label.add(nodePanel)
 
             val panel = this
             addMouseListener(object : MouseAdapter() {
@@ -207,7 +210,7 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
         var oldElement = element
         val textField = JTextField().apply {
             val textField = this
-            if( element !is JSONEmpty ) text = element.toString()
+            if( element !is JSONNull) text = element.toString()
             addKeyListener(object : KeyAdapter() {
                 override fun keyPressed(e: KeyEvent) {
                     if (e.keyCode == KeyEvent.VK_ENTER) {
@@ -227,9 +230,9 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
         return when {
             value.startsWith("\"") && value.endsWith("\"") -> JSONString(value.drop(1).dropLast(1))
             value.toIntOrNull() != null -> JSONNumber(value.toInt())
-            value.toDoubleOrNull() != null -> JSONFloat(value.toDouble())
+            value.toDoubleOrNull() != null -> JSONNumber(value.toDouble())
             value.toBooleanStrictOrNull() != null -> JSONBoolean(value.toBooleanStrict())
-            value.isEmpty() -> JSONEmpty()
+            value.isEmpty() -> JSONNull()
             else -> JSONString(value)
         }
     }

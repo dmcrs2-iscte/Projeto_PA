@@ -1,3 +1,5 @@
+package json
+
 import java.lang.IllegalArgumentException
 import kotlin.reflect.full.declaredMemberProperties
 
@@ -43,10 +45,10 @@ class JSONGenerator {
                 }
             } else {
                 when (value) {
-                    null -> addToNode(JSONEmpty())
+                    null -> addToNode(JSONNull())
                     is Number -> {
                         if (value.toDouble() == value.toInt().toDouble()) addToNode(JSONNumber(value.toInt()))
-                        else addToNode(JSONFloat(value.toDouble()))
+                        else addToNode(JSONNumber(value.toDouble()))
                     }
 
                     is Boolean -> addToNode(JSONBoolean(value))

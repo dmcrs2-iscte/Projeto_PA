@@ -1,3 +1,7 @@
+package mvc
+
+import json.JSONObject
+import json.JSONObserver
 import javax.swing.JTextArea
 
 class JSONView(private val json: JSONObject) : JTextArea() {

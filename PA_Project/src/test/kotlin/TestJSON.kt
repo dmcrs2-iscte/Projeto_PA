@@ -1,3 +1,4 @@
+import json.*
 import kotlin.test.*
 
 class TestJSON {
@@ -11,7 +12,8 @@ class TestJSON {
             JSONProperty("courses", JSONArray(mutableListOf(
                 JSONString("CALC"),
                 JSONString("ALG")
-            )))
+            ))
+            )
         ))
 
         val jsonArray = JSONArray(mutableListOf(
@@ -29,7 +31,8 @@ class TestJSON {
             JSONProperty("courses", JSONArray(mutableListOf(
                 JSONString("CALC"),
                 JSONString("ALG")
-            ))),
+            ))
+            ),
             JSONProperty("teacher", JSONBoolean(true))
         ))
 
@@ -56,7 +59,8 @@ class TestJSON {
             JSONProperty("courses", JSONArray(mutableListOf(
                 JSONString("CALC"),
                 JSONString("ALG")
-            )))
+            ))
+            )
         ))
 
         val jsonArray = JSONArray(mutableListOf(
@@ -73,7 +77,8 @@ class TestJSON {
             JSONProperty("courses", JSONArray(mutableListOf(
                 JSONString("CALC"),
                 JSONString("ALG")
-            )))
+            ))
+            )
         ))
 
         val expectedJsonArray = JSONArray(mutableListOf(
@@ -98,7 +103,8 @@ class TestJSON {
             JSONProperty("courses", JSONArray(mutableListOf(
                 JSONString("CALC"),
                 JSONString("ALG")
-            )))
+            ))
+            )
         ))
 
         val jsonArray = JSONArray(mutableListOf(
@@ -116,7 +122,8 @@ class TestJSON {
             JSONProperty("courses", JSONArray(mutableListOf(
                 JSONString("CALC"),
                 JSONString("ALG")
-            )))
+            ))
+            )
         ))
 
         val expectedJsonArray = JSONArray(mutableListOf(
@@ -142,11 +149,15 @@ class TestJSON {
             )),
             JSONObject(mutableListOf(
                 JSONProperty("number", JSONNumber(2)),
-                JSONProperty("name", JSONString("Mary"))
-            )))
-        )
+                JSONProperty("name", JSONString("Mary")),
+                JSONProperty("nestedObject", JSONObject(mutableListOf(
+                    JSONProperty("number", JSONNumber(3)),
+                    JSONProperty("name", JSONNumber(4))
+                )))
+            ))
+        ))
 
-        val expected = mutableListOf<JSONElement>(JSONNumber(1), JSONNumber(2))
+        val expected = mutableListOf<JSONElement>(JSONNumber(1), JSONNumber(2), JSONNumber(3))
 
         assertEquals(expected, array.getElementsByKey("number"))
         assertNotEquals(expected, array.getElementsByKey("name"))
@@ -154,259 +165,121 @@ class TestJSON {
 
     @Test
     fun testGetObjectByProperty() {
-        val array = JSONArray(
-            mutableListOf(
-                JSONObject(
-                    mutableListOf(
-                        JSONProperty("numero", JSONNumber(1)),
-                        JSONProperty("nome", JSONString("eu")),
-                        JSONProperty("docente", JSONBoolean(true))
-                    )
-                ),
-                JSONObject(
-                    mutableListOf(
-                        JSONProperty("numero", JSONNumber(2))
-                    )
-                ),
-                JSONObject(
-                    mutableListOf(
-                        JSONProperty("numero", JSONNumber(3)),
-                        JSONProperty("nome", JSONBoolean(true))
-                    )
-                )
-            )
+        val array = JSONArray(mutableListOf(
+            JSONObject(mutableListOf(
+                JSONProperty("number", JSONNumber(1)),
+                JSONProperty("name", JSONString("John")),
+                JSONProperty("teacher", JSONBoolean(true))
+            )),
+            JSONObject(mutableListOf(
+                JSONProperty("number", JSONNumber(2))
+            )),
+            JSONObject(mutableListOf(
+                JSONProperty("nested", JSONObject(mutableListOf(
+                    JSONProperty("number", JSONNumber(3)),
+                    JSONProperty("name", JSONString("Mary")),
+                    JSONProperty("teacher", JSONBoolean(false))
+                )))
+            ))
+        ))
+
+        val expected = listOf(
+            JSONObject(mutableListOf(
+                JSONProperty("number", JSONNumber(1)),
+                JSONProperty("name", JSONString("John")),
+                JSONProperty("teacher", JSONBoolean(true))
+            )),
+            JSONObject(mutableListOf(
+                JSONProperty("number", JSONNumber(3)),
+                JSONProperty("name", JSONString("Mary")),
+                JSONProperty("teacher", JSONBoolean(false))
+            ))
         )
 
-        val expected = mutableListOf(
-            JSONObject(
-                mutableListOf(
-                    JSONProperty("numero", JSONNumber(1)),
-                    JSONProperty("nome", JSONString("eu")),
-                    JSONProperty("docente", JSONBoolean(true))
-                )
-            )
-        )
-
-        assertEquals(expected, array.getObjectsByProperty(mutableListOf("numero", "nome", "docente")))
+        assertEquals(expected, array.getObjectsByProperties(listOf("number", "name", "teacher")))
+        assertNotEquals(expected, array.getObjectsByProperties(listOf("number")))
     }
 
     @Test
-    fun testCheckPropertyValue() {
-        val obj1 = JSONObject(
-            mutableListOf(
-                JSONProperty( "Inscritos",
-                    JSONArray(
-                        mutableListOf(
-                            JSONObject(
-                                mutableListOf(
-                                    JSONProperty("numero", JSONNumber(1)),
-                                    JSONProperty("nome", JSONString("eu")),
-                                    JSONProperty("docente", JSONBoolean(true)),
-                                    JSONProperty("altura", JSONFloat(1.73))
-                                )
-                            ),
-                            JSONObject(
-                                mutableListOf(
-                                    JSONProperty("numero", JSONNumber(2)),
-                                    JSONProperty("data", JSONEmpty())
-                                )
-                            ),
-                            JSONObject(
-                                mutableListOf(
-                                    JSONProperty("numero", JSONNumber(3)),
-                                    JSONProperty("nome", JSONString("tu")),
-                                    JSONProperty("data", JSONEmpty()),
-                                    JSONProperty("altura", JSONFloat(1.74))
-                                )
-                            )
-                        )
-                    )
-                ),
-                JSONProperty("Outros",
-                    JSONObject(
-                        mutableListOf(
-                            JSONProperty("numero", JSONNumber(3)),
-                            JSONProperty("nome", JSONString("tu")),
-                            JSONProperty("data", JSONEmpty()),
-                            JSONProperty("altura", JSONFloat(1.74))
-                        )
-                    ))
-            )
-        )
+    fun testCheckPropertyTypes() {
+        val jsonObject = JSONObject(mutableListOf(
+            JSONProperty("students", JSONArray(mutableListOf(
+                JSONObject(mutableListOf(
+                    JSONProperty("number", JSONNumber(1)),
+                    JSONProperty("name", JSONString("John")),
+                    JSONProperty("teacher", JSONBoolean(true)),
+                    JSONProperty("courses", JSONArray(mutableListOf(
+                        JSONString("MEC"),
+                        JSONString("ROB")
+                    ))),
+                    JSONProperty("professor", JSONObject(mutableListOf(
+                        JSONProperty("name", JSONString("Peter"))
+                    )))
+                )),
+                JSONObject(mutableListOf(
+                    JSONProperty("number", JSONNumber(3)),
+                    JSONProperty("name", JSONString("Mary")),
+                    JSONProperty("date", JSONNull()),
+                    JSONProperty("courses", JSONArray(mutableListOf(
+                        JSONString("TAM"),
+                        JSONString("MER"),
+                        JSONString("BOA")
+                    ))),
+                    JSONProperty("professor", JSONObject(mutableListOf(
+                        JSONProperty("name", JSONString("Rose"))
+                    )))
+                ))
+            )))
+        ))
 
-        val obj2 = JSONObject(
-            mutableListOf(
-                JSONProperty("Outros",
-                    JSONArray(
-                        mutableListOf(
-                            JSONObject(
-                                mutableListOf(
-                                    JSONProperty("numero", JSONNumber(1)),
-                                    JSONProperty("nome", JSONString("eu")),
-                                    JSONProperty("docente", JSONBoolean(true)),
-                                    JSONProperty("altura", JSONFloat(1.73))
-                                )
-                            ),
-                            JSONObject(
-                                mutableListOf(
-                                    JSONProperty("numero", JSONString("2")),
-                                    JSONProperty("data", JSONEmpty()),
-                                    JSONProperty("docente", JSONEmpty())
-                                )
-                            ),
-                            JSONObject(
-                                mutableListOf(
-                                    JSONProperty("numero", JSONNumber(3)),
-                                    JSONProperty("nome", JSONBoolean(true)),
-                                    JSONProperty("data", JSONString("01-02-2023")),
-                                    JSONProperty("altura", JSONNumber(2))
-                                )
-                            )
-                        )
-                    )
-                ),
-                JSONProperty("Inscritos",
-                    JSONObject(
-                        mutableListOf(
-                            JSONProperty("numero", JSONNumber(3)),
-                            JSONProperty("nome", JSONBoolean(true)),
-                            JSONProperty("data", JSONString("01-02-2023")),
-                            JSONProperty("altura", JSONNumber(2))
-                        )
-                    )
-                )
-            )
-        )
+        assertTrue(jsonObject.areNumbers("number"))
+        assertTrue(jsonObject.areStrings("name"))
+        assertTrue(jsonObject.areBooleans("teacher"))
+        assertTrue(jsonObject.areNulls("date"))
+        assertTrue(jsonObject.areArrays("courses"))
+        assertTrue(jsonObject.areObjects("professor"))
 
-        assertTrue(obj1.areStrings("nome"))
-        assertTrue(obj1.areBooleans("docente"))
-        assertTrue(obj1.areFloats("altura"))
-        assertTrue(obj1.areNumbers("numero"))
-        assertTrue(obj1.areNulls("data"))
-        assertTrue(obj1.isListOfProperties("Outros"))
-        assertTrue(obj1.isListOfElements("Inscritos"))
-
-        assertFalse(obj2.areStrings("nome"))
-        assertFalse(obj2.areBooleans("docente"))
-        assertFalse(obj2.areFloats("altura"))
-        assertFalse(obj2.areNumbers("numero"))
-        assertFalse(obj2.areNulls("data"))
-        assertFalse(obj2.isListOfProperties("Outros"))
-        assertFalse(obj2.isListOfElements("Inscritos"))
+        assertFalse(jsonObject.areNumbers("name"))
+        assertFalse(jsonObject.areStrings("number"))
+        assertFalse(jsonObject.areBooleans("date"))
+        assertFalse(jsonObject.areNulls("teacher"))
+        assertFalse(jsonObject.areArrays("professor"))
+        assertFalse(jsonObject.areObjects("courses"))
     }
 
     @Test
-    fun testCheckArrayInternalStructure(){
-        val obj1 = JSONObject(
-            mutableListOf(
-                JSONProperty( "Inscritos",
-                    JSONArray(
-                        mutableListOf(
-                            JSONObject(
-                                mutableListOf(
-                                    JSONProperty("numero", JSONNumber(1)),
-                                    JSONProperty("nome", JSONString("eu")),
-                                    JSONProperty("docente", JSONBoolean(true)),
-                                    JSONProperty("altura", JSONFloat(1.73))
-                                )
-                            ),
-                            JSONObject(
-                                mutableListOf(
-                                    JSONProperty("numero", JSONNumber(1)),
-                                    JSONProperty("nome", JSONString("eu")),
-                                    JSONProperty("docente", JSONBoolean(true)),
-                                    JSONProperty("altura", JSONFloat(1.73))
-                                )
-                            ),
-                            JSONObject(
-                                mutableListOf(
-                                    JSONProperty("numero", JSONNumber(1)),
-                                    JSONProperty("nome", JSONString("eu")),
-                                    JSONProperty("docente", JSONBoolean(true)),
-                                    JSONProperty("altura", JSONFloat(1.73))
-                                )
-                            )
-                        )
-                    )
-                )
-            )
-        )
+    fun testCheckArrayInternalStructure() {
+        val jsonObject = JSONObject(mutableListOf(
+            JSONProperty("array1", JSONArray(mutableListOf(
+                JSONObject(mutableListOf(
+                    JSONProperty("name", JSONString("john")),
+                    JSONProperty("age", JSONNumber(1)),
+                )),
+                JSONObject(mutableListOf(
+                    JSONProperty("name", JSONString("doe")),
+                    JSONProperty("age", JSONNumber(2)),
+                ))
+            ))),
+            JSONProperty("array2", JSONArray(mutableListOf(
+                JSONObject(mutableListOf(
+                    JSONProperty("name", JSONString("john")),
+                    JSONProperty("age", JSONNumber(1)),
+                    JSONProperty("valid", JSONBoolean(false))
+                )),
+                JSONObject(mutableListOf(
+                    JSONProperty("name", JSONString("doe")),
+                    JSONProperty("age", JSONNumber(2)),
+                ))
+            )))
+        ))
 
-        val obj2 = JSONObject(
-            mutableListOf(
-                JSONProperty( "Inscritos",
-                    JSONArray(
-                        mutableListOf(
-                            JSONObject(
-                                mutableListOf(
-                                    JSONProperty("numero", JSONNumber(1)),
-                                    JSONProperty("nome", JSONString("eu")),
-                                    JSONProperty("docente", JSONBoolean(true)),
-                                    JSONProperty("altura", JSONFloat(1.73))
-                                )
-                            ),
-                            JSONObject(
-                                mutableListOf(
-                                    JSONProperty("numero", JSONNumber(2)),
-                                    JSONProperty("data", JSONEmpty())
-                                )
-                            ),
-                            JSONObject(
-                                mutableListOf(
-                                    JSONProperty("numero", JSONNumber(3)),
-                                    JSONProperty("nome", JSONString("tu")),
-                                    JSONProperty("data", JSONEmpty()),
-                                    JSONProperty("altura", JSONFloat(1.74))
-                                )
-                            )
-                        )
-                    )
-                )
-            )
-        )
-
-        val obj3 = JSONObject(
-            mutableListOf(
-                JSONProperty( "Inscritos",
-                    JSONArray(
-                        mutableListOf(
-                            JSONObject(
-                                mutableListOf(
-                                    JSONProperty("numero", JSONNumber(1)),
-                                    JSONProperty("nome", JSONString("eu")),
-                                    JSONProperty("docente", JSONBoolean(true)),
-                                    JSONProperty("altura", JSONFloat(1.73))
-                                )
-                            ),
-                            JSONObject(
-                                mutableListOf(
-                                    JSONProperty("numero", JSONNumber(2)),
-                                    JSONProperty("data", JSONEmpty())
-                                )
-                            ),
-                            JSONObject(
-                                mutableListOf(
-                                    JSONProperty("numero", JSONNumber(3)),
-                                    JSONProperty("nome", JSONString("tu")),
-                                    JSONProperty("data", JSONEmpty()),
-                                    JSONProperty("altura", JSONFloat(1.74))
-                                )
-                            ),
-                            JSONEmpty()
-                        )
-                    )
-                )
-            )
-        )
-        
-        assertTrue(obj1.isStructuredArray("Inscritos"))
-        assertFalse(obj2.isStructuredArray("Inscritos"))
-        assertFalse(obj3.isStructuredArray("Inscritos"))
+        assertTrue(jsonObject.arrayIsStructured("array1"))
+        assertFalse(jsonObject.arrayIsStructured("array2"))
     }
 
     data class Student(
         @JSONGenerator.AsJSONString
-        @JSONGenerator.UseName("newName")
+        @JSONGenerator.UseName("NUMBER")
         val number: Int,
         val name: String,
         val type: StudentType? = null,
@@ -427,46 +300,48 @@ class TestJSON {
     )
 
     enum class StudentType {
-        Bachelor//, Master, Doctoral
+        Bachelor
     }
 
     @Test
     fun testJsonGenerator() {
-        val student = Student(1, "eu", StudentType.Bachelor, null, 1.73, listOf("MEC","ROB","TAM","MER","BOA"),
-            mapOf("MEC" to 1, "ROB" to 2,"TAM" to 3,"MER" to 4,"BOA" to 5), true, Professor(40, "Pedro"), 'a',
+        val student = Student(1, "john", StudentType.Bachelor,
+            null, 1.73, listOf("MEC","ROB","TAM","MER","BOA"),
+            mapOf("MEC" to 1, "ROB" to 2,"TAM" to 3,"MER" to 4,"BOA" to 5),
+            true, Professor(40, "mary"), 'a',
             "WillBeExcluded"
         )
 
         val json = JSONGenerator.generateJSON(student)
 
-        val preExpected = JSONObject(mutableListOf(JSONProperty("newName", JSONString("1")), JSONProperty("name", JSONString("eu")),
-            JSONProperty("birth", JSONEmpty()), JSONProperty("height", JSONFloat(1.73)), JSONProperty("courses", JSONArray(
-                mutableListOf(JSONString("MEC"),JSONString("ROB"),JSONString("TAM"),JSONString("MER"),JSONString("BOA")))),
-            JSONProperty("scores", JSONObject(mutableListOf(JSONProperty("MEC", JSONNumber(1)), JSONProperty("ROB", JSONNumber(2)),
-                JSONProperty("TAM", JSONNumber(3)), JSONProperty("MER", JSONNumber(4)), JSONProperty("BOA", JSONNumber(5))))),
-            JSONProperty("valid", JSONBoolean(true)), JSONProperty("professor", JSONObject(mutableListOf(JSONProperty("age", JSONNumber(40)),
-                JSONProperty("name", JSONString("Pedro"))))), JSONProperty("adse", JSONString("a")), JSONProperty("type", JSONString("Bachelor"))))
-
-        val expected = JSONObject( preExpected.value.sortedBy { it.getName() }.toMutableList())
-
-        println(JSONObject().toTree())
+        val expected = JSONObject(mutableListOf(
+            JSONProperty("adse", JSONString("a")),
+            JSONProperty("birth", JSONNull()),
+            JSONProperty("courses", JSONArray(mutableListOf(
+                JSONString("MEC"),
+                JSONString("ROB"),
+                JSONString("TAM"),
+                JSONString("MER"),
+                JSONString("BOA")
+            ))),
+            JSONProperty("height", JSONNumber(1.73)),
+            JSONProperty("name", JSONString("john")),
+            JSONProperty("NUMBER", JSONString("1")),
+            JSONProperty("professor", JSONObject(mutableListOf(
+                JSONProperty("age", JSONNumber(40)),
+                JSONProperty("name", JSONString("mary"))
+            ))),
+            JSONProperty("scores", JSONObject(mutableListOf(
+                JSONProperty("MEC", JSONNumber(1)),
+                JSONProperty("ROB", JSONNumber(2)),
+                JSONProperty("TAM", JSONNumber(3)),
+                JSONProperty("MER", JSONNumber(4)),
+                JSONProperty("BOA", JSONNumber(5))
+            ))),
+            JSONProperty("type", JSONString("Bachelor")),
+            JSONProperty("valid", JSONBoolean(true))
+        ))
 
         assertEquals(expected, json)
-    }
-
-    @Test
-    fun testJsonReplaceElement() {
-        val jsonObject = JSONObject(mutableListOf(
-            JSONProperty("a", JSONNumber(1)),
-            JSONProperty("b", JSONNumber(2)),
-            JSONProperty("c", JSONNumber(3)),
-            JSONProperty("obj", JSONObject(mutableListOf(
-                JSONProperty("x", JSONNumber(101)),
-                JSONProperty("y", JSONNumber(102)),
-                JSONProperty("z", JSONNumber(103))
-            ))
-        )))
-
-        jsonObject.replaceElement("c", JSONNumber(4))
     }
 }

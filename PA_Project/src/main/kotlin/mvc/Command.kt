@@ -1,3 +1,6 @@
+package mvc
+
+import json.*
 import java.awt.Component
 import java.awt.Container
 import javax.swing.JComponent
@@ -9,7 +12,8 @@ interface Command {
     fun undo()
 }
 
-internal class AddElement(private val jsonNode: JSONNode, private val key: String, private val element: JSONElement, private val component: JComponent): Command {
+internal class AddElement(private val jsonNode: JSONNode, private val key: String, private val element: JSONElement, private val component: JComponent):
+    Command {
     override fun run() {
         if (jsonNode is JSONObject) jsonNode.addElement(JSONProperty(key, element))
         else if (jsonNode is JSONArray) jsonNode.addElement(element)
@@ -26,7 +30,8 @@ internal class AddElement(private val jsonNode: JSONNode, private val key: Strin
     }
 }
 
-internal class RemoveElement(private val jsonNode: JSONNode, private val key: String, private val element: JSONElement, private val component: JComponent): Command {
+internal class RemoveElement(private val jsonNode: JSONNode, private val key: String, private val element: JSONElement, private val component: JComponent):
+    Command {
     private var parent = Container()
     private var index = -1
 
@@ -55,7 +60,8 @@ internal class RemoveElement(private val jsonNode: JSONNode, private val key: St
     }
 }
 
-internal class ReplaceElement(private val jsonNode: JSONNode, private val key: String, private val element: JSONElement, private val newElement: JSONElement, private val component: JComponent): Command {
+internal class ReplaceElement(private val jsonNode: JSONNode, private val key: String, private val element: JSONElement, private val newElement: JSONElement, private val component: JComponent):
+    Command {
     override fun run() {
         if (jsonNode is JSONObject) jsonNode.replaceElement(key, newElement)
         else if (jsonNode is JSONArray) jsonNode.replaceElement(element, newElement)
