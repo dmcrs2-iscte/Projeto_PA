@@ -57,7 +57,7 @@ internal class CheckArrayStructure(private val name: String) : JSONVisitor {
                         (it as? JSONObject)?.value?.map { p -> p.name to p.element::class }?.toSet() == expected
                     }
                 }
-            }
+            } else valid = true
         }
         return true
     }

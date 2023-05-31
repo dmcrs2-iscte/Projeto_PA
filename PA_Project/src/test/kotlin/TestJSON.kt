@@ -1,4 +1,5 @@
 import json.*
+import java.util.*
 import kotlin.test.*
 
 class TestJSON {
@@ -268,13 +269,32 @@ class TestJSON {
                 )),
                 JSONObject(mutableListOf(
                     JSONProperty("name", JSONString("doe")),
+                    JSONProperty("age", JSONNumber(2))
+                ))
+            ))),
+            JSONProperty("array3", JSONArray(mutableListOf(
+                JSONObject(mutableListOf(
+                    JSONProperty("name", JSONString("john")),
+                    JSONProperty("age", JSONNumber(1)),
+                    JSONProperty("object", JSONObject(mutableListOf(
+                        JSONProperty("name", JSONString("doe")),
+                        JSONProperty("age", JSONNumber(2))
+                    )))
+                )),
+                JSONObject(mutableListOf(
+                    JSONProperty("name", JSONString("doe")),
                     JSONProperty("age", JSONNumber(2)),
+                    JSONProperty("object", JSONObject(mutableListOf(
+                        JSONProperty("name", JSONString("doe")),
+                        JSONProperty("age", JSONNumber(2))
+                    )))
                 ))
             )))
         ))
 
         assertTrue(jsonObject.arrayIsStructured("array1"))
         assertFalse(jsonObject.arrayIsStructured("array2"))
+        assertTrue(jsonObject.arrayIsStructured("array"))
     }
 
     data class Student(
@@ -314,22 +334,17 @@ class TestJSON {
 
         val json = JSONGenerator.generateJSON(student)
 
-        val expected = JSONObject(mutableListOf(
-            JSONProperty("adse", JSONString("a")),
+        val unsorted = JSONObject(mutableListOf(
+            JSONProperty("NUMBER", JSONString("1")),
+            JSONProperty("name", JSONString("john")),
             JSONProperty("birth", JSONNull()),
+            JSONProperty("height", JSONNumber(1.73)),
             JSONProperty("courses", JSONArray(mutableListOf(
                 JSONString("MEC"),
                 JSONString("ROB"),
                 JSONString("TAM"),
                 JSONString("MER"),
                 JSONString("BOA")
-            ))),
-            JSONProperty("height", JSONNumber(1.73)),
-            JSONProperty("name", JSONString("john")),
-            JSONProperty("NUMBER", JSONString("1")),
-            JSONProperty("professor", JSONObject(mutableListOf(
-                JSONProperty("age", JSONNumber(40)),
-                JSONProperty("name", JSONString("mary"))
             ))),
             JSONProperty("scores", JSONObject(mutableListOf(
                 JSONProperty("MEC", JSONNumber(1)),
@@ -338,9 +353,19 @@ class TestJSON {
                 JSONProperty("MER", JSONNumber(4)),
                 JSONProperty("BOA", JSONNumber(5))
             ))),
-            JSONProperty("type", JSONString("Bachelor")),
-            JSONProperty("valid", JSONBoolean(true))
+            JSONProperty("valid", JSONBoolean(true)),
+            JSONProperty("professor", JSONObject(mutableListOf(
+                JSONProperty("age", JSONNumber(40)),
+                JSONProperty("name", JSONString("mary"))
+            ))),
+            JSONProperty("adse", JSONString("a")),
+            JSONProperty("type", JSONString("Bachelor"))
         ))
+
+        val mutableList = unsorted.value.toMutableList()
+        val sorted = mutableList.sortedBy { it.name.lowercase(Locale.getDefault()) }.toMutableList()
+
+        val expected = JSONObject(sorted)
 
         assertEquals(expected, json)
     }
