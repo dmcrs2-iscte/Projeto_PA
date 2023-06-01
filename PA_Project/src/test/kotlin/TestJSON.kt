@@ -294,7 +294,7 @@ class TestJSON {
 
         assertTrue(jsonObject.arrayIsStructured("array1"))
         assertFalse(jsonObject.arrayIsStructured("array2"))
-        assertTrue(jsonObject.arrayIsStructured("array"))
+        assertTrue(jsonObject.arrayIsStructured("array3"))
     }
 
     data class Student(
@@ -363,7 +363,7 @@ class TestJSON {
         ))
 
         val mutableList = unsorted.value.toMutableList()
-        val sorted = mutableList.sortedBy { it.name.lowercase(Locale.getDefault()) }.toMutableList()
+        val sorted = mutableList.sortedBy { it.getName().lowercase(Locale.getDefault()) }.toMutableList()
 
         val expected = JSONObject(sorted)
 
