@@ -81,7 +81,7 @@ val jsonObject = JSONObject(
             	JSONString("algebra"),
             	JSONString("calculus")
         )))
-))
+)
 ```
 
 # *Operations:*
