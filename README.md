@@ -41,7 +41,7 @@ The user may also add, remove and replace values after creating the object, usin
 
 addElement(JSONProperty)
 removeElement(JSONProperty)
-replaceElement(String, JSONElement)
+replaceElement(name, JSONElement)
 
 ## *When used on an array:*
 
@@ -54,13 +54,18 @@ replaceElement(JSONElement, JSONElement)
 
 ### *There are many functions defined for getting information about the objects/arrays:*
 
- - getValuesByName(name): returns a list of the JSON elements corresponding to a specified key
- - getObjectsByProperty(properties): returns a list of all objects with every property given as parameter
- - areNumbers(name), areFloats(name), areNulls(name), areStrings(name), areBooleans(name): returns true if every property with the given key is of the mentioned type, false otherwise
- - isListOfProperties(name):
- - isListOfElements(name):
- - isStructuredArray(name): returns true if the all the elements of the array with key given as parameter have the same structure
- - toTree(): returns the tree-like structure of the object
+| Command | Description |
+| ------- | ----------- |
+| getValuesByName(name) | returns a list of the JSON elements corresponding to a specified key |
+| getObjectsByProperty(properties) | returns a list of all objects with every property given as parameter |
+| areNumbers(name) | returns true if every property with the given key is a Number, false otherwise |
+| areNulls(name) | returns true if every property with the given key is null, false otherwise |
+| areStrings(name) | returns true if every property with the given key is a String, false otherwise |
+| areBooleans(name) | returns true if every property with the given key is a Boolean, false otherwise |
+| areObjects(name) | returns true if every property with the given key is a List of JSONProperties, false otherwise |
+| areArrays(name) | returns true if every property with the given key is a List of JSONElements, false otherwise |
+| isStructuredArray(name) | returns true if the all the elements of the array with key given as parameter have the same structure |
+| toTree() | returns the tree-like structure of the object |
 
 
 # *JSONGenerator:*
