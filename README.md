@@ -35,19 +35,13 @@ val jsonObject = JSONObject(
 ))
 ```
 
-The user may also add, remove and replace values after creating the object, using the functions addElement, removeElement and replaceElement. These functions take different parameters depending on them being used on an object or an array.
+The user may also add, remove and replace values after creating the object, using the functions addElement, removeElement and replaceElement. These functions take different parameters depending on them being used on an object or an array:
 
-## *When used on an object:*
-
-addElement(JSONProperty)
-removeElement(JSONProperty)
-replaceElement(name, JSONElement)
-
-## *When used on an array:*
-
-addElement(JSONElement)
-removeElement(JSONElement)
-replaceElement(JSONElement, JSONElement)
+| Command | JSONObject Argument | JSONArray Argument | Description |
+| ------- | ------------------- | ------------------ | ----------- |
+| addElement | (JSONProperty) | (JSONElement) | Adds the component given as an argument to the specified JSONNode |
+| removeElement | (JSONProperty) | (JSONElement) | Removes the component gives as an argument from the specified JSONNode |
+| replaceElement | (name, JSONElement) | (JSONElement, JSONElement) | In the case of a JSONObject, it replaces the JSONElement associated with the JSONProperty with the given name with the given JSONElement. In the case of a JSONArray, it replace the previous JSONElement with the given one |
 
 
 ## *Other operations:*
@@ -56,16 +50,16 @@ replaceElement(JSONElement, JSONElement)
 
 | Command | Description |
 | ------- | ----------- |
-| getValuesByName(name) | returns a list of the JSON elements corresponding to a specified key |
-| getObjectsByProperty(properties) | returns a list of all objects with every property given as parameter |
-| areNumbers(name) | returns true if every property with the given key is a Number, false otherwise |
-| areNulls(name) | returns true if every property with the given key is null, false otherwise |
-| areStrings(name) | returns true if every property with the given key is a String, false otherwise |
-| areBooleans(name) | returns true if every property with the given key is a Boolean, false otherwise |
-| areObjects(name) | returns true if every property with the given key is a List of JSONProperties, false otherwise |
-| areArrays(name) | returns true if every property with the given key is a List of JSONElements, false otherwise |
-| isStructuredArray(name) | returns true if the all the elements of the array with key given as parameter have the same structure |
-| toTree() | returns the tree-like structure of the object |
+| getValuesByName(name) | Returns a list of the JSON elements corresponding to a specified key |
+| getObjectsByProperty(properties) | Returns a list of all objects with every property given as parameter |
+| areNumbers(name) | Returns true if every property with the given key is a Number, false otherwise |
+| areNulls(name) | Returns true if every property with the given key is null, false otherwise |
+| areStrings(name) | Returns true if every property with the given key is a String, false otherwise |
+| areBooleans(name) | Returns true if every property with the given key is a Boolean, false otherwise |
+| areObjects(name) | Returns true if every property with the given key is a List of JSONProperties, false otherwise |
+| areArrays(name) | Returns true if every property with the given key is a List of JSONElements, false otherwise |
+| isStructuredArray(name) | Returns true if the all the elements of the array with key given as parameter have the same structure |
+| toTree() | Returns the tree-like structure of the object |
 
 
 # *JSONGenerator:*
@@ -109,6 +103,8 @@ val jsonFromStudent = JSONGenerator.generateJSON(student)
 
 The user may also use the following annotations:
 
- - JSONGenerator.AsJSONString: the corresponding attribute will be defined as a JSONString
- - JSONGenerator.UseName(String): the corresponding attribute's key in the JSON object will be the one passed as argument instead of the name defined in the instance value
- - JSONGenerator.ExcludeFromJSON: the corresponding attribute will not be represented in the JSON object
+| Annotation | Description |
+| ---------- | ----------- |
+| JSONGenerator.AsJSONString | The corresponding attribute will be defined as a JSONString |
+| JSONGenerator.UseName(String) | The corresponding attribute's key in the JSONObject will be the one passed as argument instead of the name defined in the instance value |
+| JSONGenerator.ExcludeFromJSON | The corresponding attribute will not be represented in the JSONObject |
