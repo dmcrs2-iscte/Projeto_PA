@@ -165,7 +165,7 @@ class TestJSON {
     }
 
     @Test
-    fun testGetObjectByProperty() {
+    fun testGetObjectsByProperty() {
         val array = JSONArray(mutableListOf(
             JSONObject(mutableListOf(
                 JSONProperty("number", JSONNumber(1)),

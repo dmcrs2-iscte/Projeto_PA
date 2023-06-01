@@ -49,20 +49,20 @@ sealed interface JSONNode : JSONElement, JSONObserver {
     private fun listAux(name: String, predicate: (Any?) -> Boolean): Boolean =
         this.arePropertiesOfType(name) { it is List<*> && it.all(predicate) }
 
-    fun areNumbers(name: String): Boolean = this.arePropertiesOfType(name) { it is Number }
+    fun areNumbers(key: String): Boolean = this.arePropertiesOfType(key) { it is Number }
 
-    fun areNulls(name: String): Boolean = this.arePropertiesOfType(name) { it == null }
+    fun areNulls(key: String): Boolean = this.arePropertiesOfType(key) { it == null }
 
-    fun areStrings(name: String): Boolean = this.arePropertiesOfType(name) { it is String }
+    fun areStrings(key: String): Boolean = this.arePropertiesOfType(key) { it is String }
 
-    fun areBooleans(name: String): Boolean = this.arePropertiesOfType(name) { it is Boolean }
+    fun areBooleans(key: String): Boolean = this.arePropertiesOfType(key) { it is Boolean }
 
-    fun areObjects(name: String): Boolean = listAux(name) { it is JSONProperty }
+    fun areObjects(key: String): Boolean = listAux(key) { it is JSONProperty }
 
-    fun areArrays(name: String): Boolean = listAux(name) { it is JSONElement }
+    fun areArrays(key: String): Boolean = listAux(key) { it is JSONElement }
 
-    fun arrayIsStructured(name: String): Boolean {
-        val visitor = CheckArrayStructure(name)
+    fun arrayIsStructured(key: String): Boolean {
+        val visitor = CheckArrayStructure(key)
         this.accept(visitor)
         return visitor.isValid()
     }

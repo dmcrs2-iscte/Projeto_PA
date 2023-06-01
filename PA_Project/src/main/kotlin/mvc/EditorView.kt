@@ -73,7 +73,7 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
                 if (text != null) {
                     if (text.isEmpty())
                         JOptionPane.showMessageDialog(
-                            panel, "Nome da propriedade não pode ser vazio!",
+                            panel, "Property name must not be empty",
                             "Josue", JOptionPane.ERROR_MESSAGE
                         )
                     else {
@@ -81,7 +81,7 @@ class EditorView(private val jsonNode: JSONNode, private val observer: EditorVie
                             panel.add(widgetFunction(text))
                         } catch (e: IllegalArgumentException) {
                             JOptionPane.showMessageDialog(
-                                panel, "Nome da propriedade não pode ser igual a outro dentro do mesmo objeto!",
+                                panel, "Object already has property with that name",
                                 "Josue", JOptionPane.ERROR_MESSAGE
                             )
                         }
