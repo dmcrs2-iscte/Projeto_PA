@@ -16,12 +16,61 @@ The key-value pairs of the JSON objects are represented by the data class JSONPr
 The JSONObserver interface was defined with the purpose of implementing the observer design pattern in the editor GUI. A JSONNode may have observers which are notified when changes occur in the structure of a JSON object or array, triggering an update in the visual representation of the file in the GUI.
 
 
-# *Defining JSONObjects:*
+# *Defining all the JSONElements:*
 
-In order to create a JSON Object, the user may use the JSONObject data class and pass a mutable list of JSONProperties as parameter. These JSONProperties take a key (String) and an element (JSONElement) as parameters.
+## *JSONNumbers:*
 
-As an example, say we want to define a JSON object representing John Doe, a 35 year old teacher who teaches algebra and calculus. Here's how it could look:
+JSON equivalents to Numbers. They are defined by:
+```kotlin
+val jsonNumber_1 = JSONNumber(123)
+val jsonNumber_2 = JSONNumber(2.0)
+val jsonNumber_3 = JSONNumber(3.0f)
+...
+```
 
+## *JSONStrings:*
+
+JSON equivalents to Strings. They are defined by:
+```kotlin
+val jsonString = JSONString("abc")
+```
+
+## *JSONBooleans:*
+
+JSON equivalents to Booleans. They are defined by:
+```kotlin
+val jsonBoolean = JSONBoolean(true)
+```
+
+## *JSONNulls:*
+
+JSON equivalents to nulls. They are defined by:
+```kotlin
+val jsonNull = JSONNull()
+```
+## *JSONArrays:*
+
+In order to create a JSON Array, the user may use the JSONArray data class and pass a mutable list of JSONElements as a parameter.
+As an example, say we wanto to define a JSONArray representing a list of classes:
+```kotlin
+val jsonArray = JSONArray(
+	JSONString("algebra"),
+	JSONString("calculus")
+	)
+```
+
+## *JSONObjects:*
+
+In order to create a JSON Object, the user may use the JSONObject data class and pass a mutable list of JSONProperties as a parameter.
+
+### *Defining a JSONProperty:*
+
+Despite it's name, a JSONProperty does not implement JSONElement, so it is not consider as an element, but rather as a helper class that has the structure needed for the JSONObject to use internally. As so a JSONProperty is defined by a *name* and a *JSONElement*, associating both:
+```kotlin
+val jsonProperty = JSONProperty("first name", JSONString("John"))
+```
+A JSONObject is then represented by a list of names that are associated with elements.
+As an example, say we want to define a JSONObject representing John Doe, a 35 year old teacher who teaches algebra and calculus. Here's how it could look:
 ```kotlin
 val jsonObject = JSONObject(
 	JSONProperty("first name", JSONString("John")),
@@ -35,13 +84,15 @@ val jsonObject = JSONObject(
 ))
 ```
 
+# *Operations:*
+
 The user may also add, remove and replace values after creating the object, using the functions addElement, removeElement and replaceElement. These functions take different parameters depending on them being used on an object or an array:
 
 | Command | JSONObject Argument | JSONArray Argument | Description |
 | ------- | ------------------- | ------------------ | ----------- |
 | addElement | (JSONProperty) | (JSONElement) | Adds the component given as an argument to the specified JSONNode |
 | removeElement | (JSONProperty) | (JSONElement) | Removes the component gives as an argument from the specified JSONNode |
-| replaceElement | (name,JSONElement) | (JSONElement, JSONElement) | In the case of a JSONObject, it replaces the JSONElement associated with the JSONProperty with the given name with the given JSONElement. In the case of a JSONArray, it replace the previous JSONElement with the given one |
+| replaceElement | (name, JSONElement) | (JSONElement, JSONElement) | In the case of a JSONObject, it replaces the JSONElement associated with the JSONProperty with the given name with the given JSONElement. In the case of a JSONArray, it replace the previous JSONElement with the given one |
 
 
 ## *Other operations:*
@@ -108,3 +159,19 @@ The user may also use the following annotations:
 | JSONGenerator.AsJSONString | The corresponding attribute will be defined as a JSONString |
 | JSONGenerator.UseName(String) | The corresponding attribute's key in the JSONObject will be the one passed as argument instead of the name defined in the instance value |
 | JSONGenerator.ExcludeFromJSON | The corresponding attribute will not be represented in the JSONObject |
+
+# *Observers:*
+
+Observers that are implemented:
+
+| Observer | Motivation |
+| -------- | ----------- |
+|JSONObserver | Implemented by JSONNodes facilitating communication between the JSON model and, for example, front end applications by the user. When a node is added to another node becoming nested, the parent node starts being an Observer of the nested one, so as to relay information to the root node. If an app is Observing the root node, then all changes inside it, including inside the nested nodes, are relayed to this app |
+
+This observer is notified when:
+
+| Operation | Description |
+| --------- | ----------- |
+| elementAdded() | Receives information that an element was added to the node it's observing |
+| elementRemoved() | Receives information that an element was removed from the node it's observing |
+| elementReplaced() | Receives information that an element was remoed from the node it's observing |
