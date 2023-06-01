@@ -25,7 +25,7 @@ JSON equivalents to Numbers. They are defined by:
 val jsonNumber_1 = JSONNumber(123)
 val jsonNumber_2 = JSONNumber(2.0)
 val jsonNumber_3 = JSONNumber(3.0f)
-...
+//...
 ```
 
 ## *JSONStrings:*
