@@ -41,7 +41,7 @@ The user may also add, remove and replace values after creating the object, usin
 | ------- | ------------------- | ------------------ | ----------- |
 | addElement | (JSONProperty) | (JSONElement) | Adds the component given as an argument to the specified JSONNode |
 | removeElement | (JSONProperty) | (JSONElement) | Removes the component gives as an argument from the specified JSONNode |
-| replaceElement | (name, JSONElement) | (JSONElement, JSONElement) | In the case of a JSONObject, it replaces the JSONElement associated with the JSONProperty with the given name with the given JSONElement. In the case of a JSONArray, it replace the previous JSONElement with the given one |
+| replaceElement | (name,JSONElement) | (JSONElement, JSONElement) | In the case of a JSONObject, it replaces the JSONElement associated with the JSONProperty with the given name with the given JSONElement. In the case of a JSONArray, it replace the previous JSONElement with the given one |
 
 
 ## *Other operations:*
