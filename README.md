@@ -1,11 +1,11 @@
-# *Purpose*:
+# *Purpose:*
 
 This library was created with the purpose of representing JSON files in Kotlin. It includes representations for every JSON data type, including Number, Boolean, String, Empty, Object and Array.
 
 The user may use the library with a text-based approach, i.e. creating representations of JSON objects by defining them manually using the appropriate data classes, or with an editor-based approach, using a GUI and defining JSON objects in a more interactive manner, making use of the widgets and the visual representation of the JSON file being created in real time.
 
 
-Architecture:
+# *Architecture:*
 
 Every JSON data type implements either the JSONNode interface or the JSONLeaf interface. JSONNode represents composite JSON types - JSON Object and JSON Array. On the other hand, JSONLeaf represents the data types which don't contain other nested elements (String, Number, etc.).
 
@@ -16,7 +16,7 @@ The key-value pairs of the JSON objects are represented by the data class JSONPr
 The JSONObserver interface was defined with the purpose of implementing the observer design pattern in the editor GUI. A JSONNode may have observers which are notified when changes occur in the structure of a JSON object or array, triggering an update in the visual representation of the file in the GUI.
 
 
-Defining JSONObjects:
+# *Defining JSONObjects:*
 
 In order to create a JSON Object, the user may use the JSONObject data class and pass a mutable list of JSONProperties as parameter. These JSONProperties take a key (String) and an element (JSONElement) as parameters.
 
@@ -37,22 +37,22 @@ val jsonObject = JSONObject(
 
 The user may also add, remove and replace values after creating the object, using the functions addElement, removeElement and replaceElement. These functions take different parameters depending on them being used on an object or an array.
 
-When used on an object:
+## *When used on an object:*
 
 addElement(JSONProperty)
 removeElement(JSONProperty)
 replaceElement(String, JSONElement)
 
-When used on an array:
+## *When used on an array:*
 
 addElement(JSONElement)
 removeElement(JSONElement)
 replaceElement(JSONElement, JSONElement)
 
 
-Other operations:
+## *Other operations:*
 
-There are many functions defined for getting information about the objects/arrays:
+### *There are many functions defined for getting information about the objects/arrays:*
 
  - getValuesByName(name): returns a list of the JSON elements corresponding to a specified key
  - getObjectsByProperty(properties): returns a list of all objects with every property given as parameter
@@ -63,10 +63,11 @@ There are many functions defined for getting information about the objects/array
  - toTree(): returns the tree-like structure of the object
 
 
-JSONGenerator:
+# *JSONGenerator:*
 
 This class is useful for generating a JSON object directly from any data class the user may create. For example, say we create the following data classes and enum:
 
+```kotlin
 data class Student(
         val number: Int,
         val name: String,
@@ -86,9 +87,11 @@ data class Professor(
 enum class StudentType {
     Bachelor, Master, Doctoral
 }
+```
 
 In order to generate a JSON object for representing an instance of the Student class, we might do the following:
 
+```kotlin
 val student = Student(number=100000, name="John", type=StudentType.Bachelor, height=178.1,
 	courses=listOf("ALG", "CALC1", "PROG"), 
 	scores=mapOf("ALG" to 19, "CALC1" to 16, "PROG" to 20),
@@ -96,6 +99,8 @@ val student = Student(number=100000, name="John", type=StudentType.Bachelor, hei
 
 //creates the JSON object corresponding to the instance of Student defined above.
 val jsonFromStudent = JSONGenerator.generateJSON(student) 
+```
+# *Annotations:*
 
 The user may also use the following annotations:
 
