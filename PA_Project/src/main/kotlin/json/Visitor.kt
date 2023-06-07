@@ -49,12 +49,14 @@ internal class CheckArrayStructure(private val name: String) : JSONVisitor {
     override fun visit(p: JSONProperty): Boolean {
         if (p.name == name && p.element is JSONArray) {
             val elements = p.element.value
-            if (elements.size > 1 && elements.all { it::class == elements[0]::class }) {
-                val firstElement = elements[0]
-                if (firstElement is JSONObject) {
-                    val expected = firstElement.value.map { it.name to it.element::class }.toSet()
-                    valid = elements.all {
-                        (it as? JSONObject)?.value?.map { p -> p.name to p.element::class }?.toSet() == expected
+            if (elements.size > 1) {
+                if(elements.all { it::class == elements[0]::class }) {
+                    val firstElement = elements[0]
+                    if (firstElement is JSONObject) {
+                        val expected = firstElement.value.map { it.name to it.element::class }.toSet()
+                        valid = elements.all {
+                            (it as? JSONObject)?.value?.map { p -> p.name to p.element::class }?.toSet() == expected
+                        }
                     }
                 }
             } else valid = true
